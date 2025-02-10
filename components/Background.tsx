@@ -10,6 +10,7 @@ export default function Background({children}: any) {
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }} 
       /> */}
+      <View style={{}} />
       {children}
     </SafeAreaView>
   );
@@ -18,7 +19,9 @@ export default function Background({children}: any) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    alignItems: 'center',
     justifyContent: 'center',
+    backgroundColor: "#FFFFFF",
   },
   background: {
     position: 'absolute',

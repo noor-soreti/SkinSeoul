@@ -5,12 +5,12 @@ import { router } from "expo-router";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 const buttonItems = [
-  {title: "Sign in with Apple", onPressFunction: () => { console.log("Apple") }},
-  {title: "Sign in with Google", onPressFunction: () => {console.log("Google")}},
-  {title: "Sign in with Email", onPressFunction: () => router.push("/(public)/emailSignIn")},
+  {title: "Register with Apple", onPressFunction: () => { console.log("Apple") }},
+  {title: "Register with Google", onPressFunction: () => {console.log("Google")}},
+  {title: "Register with Email", onPressFunction: () => router.push("/(public)/emailRegister")},
 ]
 
-const Index = () => {
+const Register = () => {
   return (
     <Background>
       <View style={defaultStyles.container}>
@@ -22,9 +22,9 @@ const Index = () => {
             </View>
           ))
         }    
-        <TouchableOpacity style={{top: 15}} onPress={() => router.push("/(public)/register")}>
-          <Text>Don't have an account? <Text style={{color: '#4285F4'}} >Register here</Text> </Text>
-        </TouchableOpacity>
+        {/* <TouchableOpacity style={{top: 15}} onPress={() => router.push("/(public)/register")}>
+          <Text>Already have an account? <Text style={{color: '#4285F4'}} >Sign in here</Text> </Text>
+        </TouchableOpacity> */}
       </View>
     </Background>
   );
@@ -81,4 +81,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default Index;
+export default Register;

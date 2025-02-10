@@ -9,14 +9,13 @@ const RootLayout = () => {
     NobileMedium: require('../assets/fonts/Nobile-Medium.ttf'),
     NobileBold: require('../assets/fonts/Nobile-Bold.ttf')
   })
-  // const [ user, setUser ] = useState
 
   return (
-    <Stack screenOptions={{headerShown: false}}>
-      <Stack.Screen name="index" />
+    <Stack screenOptions={{headerShown: false}} >
+      <Stack.Screen name='index'/>
+      <Stack.Screen name='(public)'/>
       <Stack.Screen name="(tabs)" />
-      <Stack.Screen name="(public)" />
-    </Stack>
+  </Stack>
   )
 }
 

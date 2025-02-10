@@ -1,10 +1,8 @@
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 
-export default function LogInButton({title, onPressFunction, key}: any) {    
+export default function SignInTextInput({value, onChangeText, key}: any) {    
     return (
-        <TouchableOpacity key={key} style={styles.button} onPress={onPressFunction}>
-            <Text>{title}</Text>
-        </TouchableOpacity>
+        <TextInput key={key} style={styles.button} value={value} onChangeText={onChangeText} />
     )
 }
 

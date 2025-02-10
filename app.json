@@ -13,7 +13,8 @@
       "bundleIdentifier": "com.noorsoreti.SkinSeoul",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
-      }
+      },
+      "googleServicesFile": "./GoogleService-Info.plist"
     },
     "android": {
       "adaptiveIcon": {
@@ -27,6 +28,8 @@
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
+			"@react-native-firebase/app",
+			"@react-native-firebase/auth",
       "expo-router",
       [
         "expo-splash-screen",
@@ -36,6 +39,14 @@
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
         }
+      ],
+      [
+        "expo-build-properties",
+          {
+            "ios": {
+              "useFrameworks": "static"
+            }
+          }
       ]
     ],
     "experiments": {
