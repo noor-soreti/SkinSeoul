@@ -4,17 +4,21 @@ import SignInTextInput from "@/components/SignInTextInput";
 import { defaultStyles } from "@/constants/Styles";
 import { router } from "expo-router";
 import { useState } from "react";
+import auth from '@react-native-firebase/auth'
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 
 const EmailSignIn = () => {
   const [ email, setEmail ] = useState('')
   const [ password, setPassword ] = useState('')
+  const [ loading, setLoading ] = useState(false)
 
-  const signIn = () => {
+  const signIn = async () => {
     try {
-      // sign in flow
+      await auth().signInWithEmailAndPassword(email, password);
     } catch (e:any) {
       alert('Sign in failed: ' + e.message)
+    } finally {
+      setLoading(false)
     }
   }
   
@@ -24,7 +28,7 @@ const EmailSignIn = () => {
         <Text style={styles.title}>Your Korean Skin Care Journey Starts Here!</Text>
         <Text>Sign In</Text>
         <TextInput style={styles.textInput} placeholder="Email" value={email} onChangeText={setEmail} autoCapitalize="none"/>
-        <TextInput style={styles.textInput} placeholder="Password" value={email} onChangeText={setPassword} autoCapitalize="none"/>
+        <TextInput style={styles.textInput} placeholder="Password" value={password} onChangeText={setPassword} autoCapitalize="none" secureTextEntry />
         <TouchableOpacity style={styles.button} onPress={signIn} >
             <Text style={styles.text}>Sign In</Text>
         </TouchableOpacity>

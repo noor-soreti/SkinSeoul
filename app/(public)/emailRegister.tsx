@@ -5,16 +5,20 @@ import { defaultStyles } from "@/constants/Styles";
 import { router } from "expo-router";
 import { useState } from "react";
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import auth from '@react-native-firebase/auth'
 
 const EmailRegister = () => {
   const [ email, setEmail ] = useState('')
   const [ password, setPassword ] = useState('')
+  const [ loading, setLoading ] = useState(false)
 
-  const register = () => {
+  const register = async () => {
     try {
-      // registration flow
+      await auth().createUserWithEmailAndPassword(email, password);
     } catch (e:any) {
       alert('Sign in failed: ' + e.message)
+    } finally {
+      setLoading(false)
     }
   }
   
@@ -24,7 +28,7 @@ const EmailRegister = () => {
         <Text style={styles.title}>Your Korean Skin Care Journey Starts Here!</Text>
         <Text>Register</Text>
         <TextInput style={styles.textInput} placeholder="Email" value={email} onChangeText={setEmail} autoCapitalize="none"/>
-        <TextInput style={styles.textInput} placeholder="Password" value={email} onChangeText={setPassword} autoCapitalize="none"/>
+        <TextInput style={styles.textInput} placeholder="Password" value={password} onChangeText={setPassword} autoCapitalize="none" secureTextEntry />
         <TouchableOpacity style={styles.button} onPress={register} >
             <Text style={styles.text}>Register</Text>
         </TouchableOpacity>
