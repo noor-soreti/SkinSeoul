@@ -48,7 +48,8 @@
     "react-native-webview": "13.12.5",
     "react-native-wheel-scrollview-picker": "^2.0.6",
     "@shopify/flash-list": "1.7.3",
-    "expo-image": "~2.0.5"
+    "expo-image": "~2.0.5",
+    "expo-camera": "~16.0.16"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",

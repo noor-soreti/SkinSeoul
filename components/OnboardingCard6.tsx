@@ -20,14 +20,34 @@ const GOALS = [
     { title: "Practice facial yoga (coming soon) 🧘‍♂️" },
 ]
 
-const OnboardingCard6 = () => {
+const OnboardingCard6 = ({width, isActive, setDisableButton, setGoals}: any) => {
     const viewRef = useRef(null);
     const buttonRef = useRef(null);
     const [ viewHeight, setViewHeight ] = useState(0)
     const [ buttonHeight, setButtonHeight ] = useState(0);
-    
+    const [ manageGoals, setManageGoals ] = useState<Array<string>>([]);
+
+    useEffect(() => {
+        if (manageGoals.length != 0) {
+            setDisableButton(false)
+        }
+    }, [manageGoals])
+
+
+    const handleSelectedGoal = (goal: string) => {  
+        if (Object.values(manageGoals).indexOf(goal) == -1) {
+            setManageGoals([...manageGoals, goal])
+        } else {
+            const index = manageGoals.indexOf(goal)
+            manageGoals.splice(index, 1)
+            setManageGoals(manageGoals)
+        }
+        setGoals(manageGoals)
+    }
+
+
     return (
-        <View style={defaultStyles.onboardingContainer} >
+        <View style={[defaultStyles.onboardingContainer, {width: width}]} >
             <Text style={defaultStyles.onboardingTitle} >What are your goals?</Text>
             <Text style={defaultStyles.onboardingCaption}>Choose as many as you want. This will help personalize products to your goals.</Text>
 
@@ -35,17 +55,47 @@ const OnboardingCard6 = () => {
                 <FlatList 
                     data={GOALS}
                     renderItem={({ item }) => 
-                    <TouchableOpacity style={styles.selector}>
-                        <Text>{item.title}</Text>
-                    </TouchableOpacity>}
-                    // estimatedItemSize={20}
+                    <>
+                        {
+                            Object.values(manageGoals).indexOf(item.title) > -1 ?
+                            <TouchableOpacity style={[styles.selector, {backgroundColor: '#FF909A'}]} onPress={() => handleSelectedGoal(item.title)}>
+                                <Text>{item.title}</Text>
+                            </TouchableOpacity>
+                            :
+                            <TouchableOpacity style={[styles.selector, {backgroundColor: '#E1DFDF',}]} onPress={() => handleSelectedGoal(item.title)}>
+                                <Text>{item.title}</Text>
+                            </TouchableOpacity>
+                        }
+
+                        {/* <TouchableOpacity style={styles.selector} onPress={() => handleSelectedGoal(item.title)}>
+                            {
+                                Object.values(manageGoals).indexOf(item.title) > -1 ?
+                                <Text style={{backgroundColor: '#FF909A'}}>{item.title}</Text>
+                                :
+                                <Text>{item.title}</Text>
+                            }
+                        </TouchableOpacity> */}
+                    </>
+                    }
+
+
+
+
+                    // <TouchableOpacity style={styles.selector} onPress={() => handleSelectedGoal(item.title)}>
+                    //     {
+                    //         Object.values(manageGoals).indexOf(item.title) > -1 ?
+                    //         <Text style={{backgroundColor: '#FF909A'}}>{item.title}</Text>
+                    //         :
+                    //         <Text>{item.title}</Text>
+                    //     }
+                    // </TouchableOpacity>}
                     style={{maxHeight: viewHeight - buttonHeight - 15 }}
                 />
             </View>
             
-            <TouchableOpacity ref={buttonRef} style={defaultStyles.onboardingButton} onLayout={(e) => setButtonHeight(e.nativeEvent.layout.height)}>
+            {/* <TouchableOpacity ref={buttonRef} style={defaultStyles.onboardingButton} onLayout={(e) => setButtonHeight(e.nativeEvent.layout.height)}>
                 <Text style={defaultStyles.onboardingButtonText} >Continue</Text>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
         </View>
     )
 };
@@ -71,7 +121,7 @@ const styles = StyleSheet.create({
     },
     selector: {
         width: '100%',
-        backgroundColor: '#E1DFDF',
+        // backgroundColor: '#E1DFDF',
         padding: 20,
         borderRadius: 10,
         marginTop: 10,

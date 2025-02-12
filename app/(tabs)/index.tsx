@@ -11,6 +11,7 @@ const HomeScreen = () => {
     
     useEffect(() => {
         async function checkFirstLaunch() {
+            // await AsyncStorage.setItem(IS_ONBOARDED, '')
             const firstLaunch = await AsyncStorage.getItem(IS_ONBOARDED);
             if (!firstLaunch) {
                 setShowOnboarding(true);

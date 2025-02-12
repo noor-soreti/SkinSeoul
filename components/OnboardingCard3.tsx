@@ -2,9 +2,9 @@ import { defaultStyles } from "@/constants/Styles";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { Image } from 'expo-image';
 
-const OnboardingCard3 = () => {    
+const OnboardingCard3 = ({width, isActive}: any) => {    
     return (
-        <View style={defaultStyles.onboardingContainer}>
+        <View style={[defaultStyles.onboardingContainer, {width: width}]}>
             <Text style={defaultStyles.onboardingTitle} >Tell us about your skin</Text>
 
             <Text style={defaultStyles.onboardingSubTitle}>
@@ -54,11 +54,6 @@ const OnboardingCard3 = () => {
                 </TouchableOpacity>
 
             </View>
-
-        
-            <TouchableOpacity style={defaultStyles.onboardingButton}>
-                <Text style={defaultStyles.onboardingButtonText} >Continue</Text>
-            </TouchableOpacity>
         </View>
     )
 };

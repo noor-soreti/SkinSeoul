@@ -1,10 +1,10 @@
 import { defaultStyles } from "@/constants/Styles";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import {Picker} from '@react-native-picker/picker';
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import ScrollPicker from "react-native-wheel-scrollview-picker";
 
-const dataSource = ["10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", 
+const dataSource = [ "-", "15", "16", "17", "18", "19", "20", 
     "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", 
     "31", "32", "33", "34", "35", "36", "37", "38", "39", "40", 
     "41", "42", "43", "44", "45", "46", "47", "48", "49", "50", 
@@ -13,13 +13,20 @@ const dataSource = ["10", "11", "12", "13", "14", "15", "16", "17", "18", "19", 
     "71", "72", "73", "74", "75", "76", "77", "78", "79", "80"]
    
 
-const OnboardingCard2 = () => {
-    const [selectedIndex, setSelectedIndex] = useState(15);
-    
+const OnboardingCard2 = ({width, isActive, setDisableButton, setAge}: any) => {
+    const [selectedIndex, setSelectedIndex] = useState(0);
+
+    useEffect(() => {
+        if (selectedIndex >= 1) {
+            setAge(dataSource[selectedIndex]);
+            setDisableButton(false)
+        }
+    }, [selectedIndex])
+
     return (
-        <View style={defaultStyles.onboardingContainer}>
+        <View style={[defaultStyles.onboardingContainer, {width: width}]} >
             <Text style={defaultStyles.onboardingTitle} >How old are you?</Text>
-            <Text style={defaultStyles.onboardingCaption}>Age affects skin concerns. This will help us personalize your product suggestions based on your age group.</Text>
+            <Text style={defaultStyles.onboardingCaption}>Age affects skin concerns. This will help us personalize product suggestions based on your age group.</Text>
             <ScrollPicker
                 dataSource={dataSource}
                 selectedIndex={selectedIndex}
@@ -43,10 +50,6 @@ const OnboardingCard2 = () => {
                 activeItemTextStyle={ { fontSize: 'red'} }
                 itemTextStyle={{color: 'red'}}
             />
-            
-            <TouchableOpacity style={defaultStyles.onboardingButton}>
-                <Text style={defaultStyles.onboardingButtonText} >Continue</Text>
-            </TouchableOpacity>
         </View>
     )
 };

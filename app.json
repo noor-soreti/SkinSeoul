@@ -12,7 +12,8 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.noorsoreti.SkinSeoul",
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSCameraUsageDescription": "We need camera access to analyze your skin using AI and recommend the best skincare routine and products tailored to you."
       },
       "googleServicesFile": "./GoogleService-Info.plist"
     },
@@ -29,6 +30,13 @@
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera",
+          "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone"
+        }
+      ],
       "@react-native-firebase/app",
       "@react-native-firebase/auth",
       "expo-router",

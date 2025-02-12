@@ -18,18 +18,21 @@ export const defaultStyles = StyleSheet.create({
         elevation: 5,  
     },
     onboardingContainer: {
+        paddingTop: '5%',
+        flex: 1,
         alignItems: 'center',
-        width: '100%',
-        paddingTop: '20%',
-        flex: 1
     },
     onboardingButton: {
         width: '90%',
         backgroundColor: '#ED6672',
         padding: 20,
         borderRadius: 10,
-        bottom: 0,
-        position: 'absolute'
+        // bottom: 0,
+        // position: 'absolute',
+        alignSelf: 'center'
+    },
+    disableOnboardingButton: {
+        backgroundColor: 'gray',
     },
     onboardingTitle: {
         fontFamily: 'Roboto',
@@ -76,7 +79,12 @@ export const defaultStyles = StyleSheet.create({
         height: 75,
         backgroundColor: '#0553',
         borderRadius: '50%'
-      },
+    },
+    selectedImage: {
+        borderWidth: 4,
+        borderColor: '#D67974',
+        backgroundColor: '#423838'
+    },
     imageText: {
         textAlign: 'center',
         fontFamily: 'NobileRegular',
