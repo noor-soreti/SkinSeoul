@@ -4,18 +4,9 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { useEffect, useState } from "react";
 
-const OnboardingCard1 = ({width, isActive, setDisableButton, setGender}: any) => {
-    const [ userGender, setUserGender ] = useState<string | null>(null);
-
-    useEffect(() => {
-        if (userGender) {
-            setGender(userGender)
-            setDisableButton(false)
-        }
-    }, [userGender])
-
+const OnboardingCard1 = ({width, isActive, setGender, gender}: any) => {
     const handleSetGender = (select: string) => {
-        setUserGender(select);
+        setGender(select);
     }
 
     return (
@@ -24,12 +15,12 @@ const OnboardingCard1 = ({width, isActive, setDisableButton, setGender}: any) =>
             <Text style={defaultStyles.onboardingCaption}>This will help us adjust your routine steps based on your gender</Text>
 
             <View style={styles.buttonContainer}>
-                <TouchableOpacity  style={[styles.button, userGender == 'female' && defaultStyles.selectedImage ]} onPress={() => handleSetGender("female")}>
+                <TouchableOpacity  style={[styles.button, gender == 'female' && defaultStyles.selectedImage ]} onPress={() => handleSetGender("female")}>
                     <Ionicons name="female-outline" size={50} color="white" />
                     <Text style={styles.text} >Female</Text>
                 </TouchableOpacity>
                 
-                <TouchableOpacity style={[styles.button, userGender == 'male' && defaultStyles.selectedImage ]} onPress={() => handleSetGender("male")}>
+                <TouchableOpacity style={[styles.button, gender == 'male' && defaultStyles.selectedImage ]} onPress={() => handleSetGender("male")}>
                     <Ionicons name="male-outline" size={50} color="white" />
                     <Text style={styles.text} >Male</Text>
                 </TouchableOpacity>

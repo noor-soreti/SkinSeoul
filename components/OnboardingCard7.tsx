@@ -1,57 +1,35 @@
 import { defaultStyles } from "@/constants/Styles"
-import { CameraType, CameraView, useCameraPermissions } from "expo-camera"
-import { useEffect, useRef, useState } from "react"
+import { useState } from "react"
 import { ActivityIndicator, Button, Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native"
-import Ionicons from '@expo/vector-icons/Ionicons';
+import * as ImagePicker from 'expo-image-picker';
+import { Image } from "expo-image";
 
-const OnboardingCard7 = ({width, isActive, setDisableButton}: any) => {
-    const [ facing, setFacing ] = useState<CameraType>('front');
-    const [ permission, requestPermission ] = useCameraPermissions();
-    const [ showCamera, setShowCamera ] = useState(false);
-    const cameraRef = useRef<any>(null);
+const OnboardingCard7 = ({width, setScan}: any) => {
+  const [image, setImage] = useState<string | null>(null);
 
-    if (!permission) {
-        // Camera permissions are still loading
-        return <ActivityIndicator color='blue' size={24} />
+
+  const pickImage = async () => {
+    // No permissions request is necessary for launching the image library
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ['images', 'videos'],
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    console.log(result);
+
+    if (!result.canceled) {
+      setImage(result.assets[0].uri);
+      setScan(result.assets[0].uri);
     }
+  };
 
-    if (!permission.granted) {
-        // Camera permissions are not granted yet.
-        return (
-            <View style={[defaultStyles.onboardingContainer, {width: width}]}>
-                <Text style={defaultStyles.onboardingTitle} >Let's scan your face</Text>
-                <Text style={defaultStyles.onboardingCaption}>Take a scan of your face to let our AI model identify the best products for your skin.</Text>
-                <Button onPress={requestPermission} title="Start Scan" />
-            </View>
-        )
-    }
-
-    async function captureCamera () {
-        if (cameraRef.current) {
-            const photo = await cameraRef.current.takePictureAsync();
-            console.log(photo.uri)
-            // handle the captured image here (e.g., upload it to a server or display it in the app)
-        }
-    }
-
-    return (
-        <Modal
-        visible={showCamera}
-        animationType="fade"
-        >
-        {/* // <View style={{width: width, paddingTop: 10, flex: 1, alignItems: 'center'}}> */}
-            <CameraView style={[{/*styles.camera*/}, {width: width, paddingTop: 10, flex: 1, alignItems: 'center'}]} facing={facing}>
-                <View style={styles.buttonContainer}>
-                    {/* <TouchableOpacity style={styles.button} onPress={toggleCameraFacing}>
-                        <Text style={styles.text}>Flip Camera</Text>
-                    </TouchableOpacity> */}
-                    <TouchableOpacity style={styles.button} onPress={captureCamera}>
-                        <Ionicons name="radio-button-on" size={50} color="#FFFFFF" />
-                    </TouchableOpacity>
-                </View>
-            </CameraView>
-    {/* //   </View> */}
-        </Modal>
+  return (
+    <View style={[defaultStyles.onboardingContainer, {width: width}]}>
+      <Button title="Pick an image from camera roll" onPress={pickImage} />
+      {image && <Image source={{ uri: image }} style={styles.image} />}
+    </View>
     )
 }
 
@@ -61,6 +39,10 @@ const styles = StyleSheet.create({
     container: {
       flex: 1,
       justifyContent: 'center',
+    },
+    image: {
+      width: 200,
+      height: 200,
     },
     message: {
       textAlign: 'center',
