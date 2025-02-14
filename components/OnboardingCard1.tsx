@@ -2,10 +2,12 @@ import { defaultStyles } from "@/constants/Styles";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import Ionicons from '@expo/vector-icons/Ionicons';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
-import { useEffect, useState } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const OnboardingCard1 = ({width, isActive, setGender, gender}: any) => {
+const OnboardingCard1 = ({width, setGender, gender}: any) => {
+
     const handleSetGender = (select: string) => {
+        console.log('select:', select);
         setGender(select);
     }
 

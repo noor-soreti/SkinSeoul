@@ -14,6 +14,7 @@ import { router } from "expo-router";
 import OnboardingCard7 from "./OnboardingCard7";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import OnboardingCard8 from "./OnboardingCard8";
+import { getData, getObject, storeData, storeObject } from "@/storageHelper";
 
 type Props = {
     onClose: () => void
@@ -31,9 +32,22 @@ export default function Onboarding ({onClose}: Props) {
     const [ age, setAge ] = useState<string | null>(null)
     const [ goals, setGoals ] = useState<Array<string> | null>([])
     const [ scan, setScan ] = useState<string | null>(null)
+    const [ skincareRoutine, setSkincareRoutine ] = useState<any | null>([])
 
     const STEP_COUNT = 5;
     const ITEM_SIZE = screenSize.width;
+
+    useEffect(() => {
+        
+        const test = async () => {
+            console.log('getAsyncRoutine', await AsyncStorage.getItem('skincareRoutine'));
+            
+        }
+
+        test()
+        
+        
+    }, [])
 
     useDerivedValue(() => {
         scrollTo(animatedRef, stepScroll.value * (ITEM_SIZE ), 0, true);
@@ -43,27 +57,27 @@ export default function Onboarding ({onClose}: Props) {
         // triggers whenever gender is updated
         if (gender) {
             (async () => {
-                await AsyncStorage.setItem("gender", gender);
+                await storeData("gender", gender);
             })();
         }
     }, [gender]);
 
     useEffect(() => {
         // triggers whenever age is updated
-        console.log('age:', age);
+        // console.log('age:', age);
         if (age) {
             (async () => {
-                await AsyncStorage.setItem("age", age);
+                await storeData("age", age);
             })();
         }
     }, [age]);    
     
     useEffect(() => {
         // triggers whenever goals is updated
-        console.log('goals:', goals);
+        // console.log('goals:', goals);
         if (goals) {
             (async () => {
-                await AsyncStorage.setItem("goals", JSON.stringify(goals));
+                await storeData("goals", JSON.stringify(goals));
             })();
         }
     }, [goals]);
@@ -73,14 +87,25 @@ export default function Onboarding ({onClose}: Props) {
         console.log('scan:', scan);
         if (scan) {
             (async () => {
-                await AsyncStorage.setItem("scan", scan);
+                await storeData("scan", scan);
             })();
         }
     }, [scan]);
 
+    useEffect(() => {
+        // triggers whenever skincareRoutine is updated
+        if (skincareRoutine) {
+            (async () => {
+                console.log('skincareRoutine:', skincareRoutine);
+                storeObject("skincareRoutine", skincareRoutine);
+            })();
+        }
+    }, [skincareRoutine])
+
     const getGenderFromAsyncStorage = async () => {        
-        const getGender = await AsyncStorage.getItem('gender');
-        console.log(getGender);
+        const getGender = await getData('gender');
+        // console.log('gender:', getGender);
+        
         if (getGender) {
             setGender(getGender);
             setDisableButton(false);
@@ -88,8 +113,9 @@ export default function Onboarding ({onClose}: Props) {
     }
 
     const getAgeFromAsyncStorage = async () => {
-        const getAge = await AsyncStorage.getItem('age');
-        console.log(getAge);
+        const getAge = await getData('age');
+        // console.log('age:', getAge);
+        
         if (getAge) {
             setAge(getAge);
             setDisableButton(false);
@@ -97,8 +123,9 @@ export default function Onboarding ({onClose}: Props) {
     }
 
     const getGoalsFromAsyncStorage = async () => {
-        const getGoals = await AsyncStorage.getItem('goals');
-        console.log(getGoals);
+        const getGoals = await getData('goals');
+        // console.log('goals:', getGoals);
+        
         if (getGoals) {
             setGoals(JSON.parse(getGoals));
             setDisableButton(false);
@@ -106,11 +133,21 @@ export default function Onboarding ({onClose}: Props) {
     }
 
     const getScanFromAsyncStorage = async () => {
-        const getScan = await AsyncStorage.getItem('scan');
-        console.log(getScan);
+        const getScan = await getData('scan');        
         if (getScan) {
             setScan(getScan);
             setDisableButton(false);
+        }
+    }
+
+    const getSkincareRoutineFromAsyncStorage = async () => {
+        const getSkincareRoutine = await AsyncStorage.getItem('skincareRoutine');
+        if (getSkincareRoutine != null) {
+            console.log('generated routine:', getSkincareRoutine);
+            if (getSkincareRoutine) {
+                setSkincareRoutine(getSkincareRoutine);
+                setDisableButton(false);
+            }
         }
     }
 
@@ -121,10 +158,15 @@ export default function Onboarding ({onClose}: Props) {
                 break;
             case 2:
                 getAgeFromAsyncStorage();
+                break;
             case 3: 
                 getGoalsFromAsyncStorage();
-            case 4: 
+                break;
+            case 4:             
                 getScanFromAsyncStorage();
+                break;
+            case 5:
+                getSkincareRoutineFromAsyncStorage();
             default:
                 break;
         }
@@ -147,7 +189,6 @@ export default function Onboarding ({onClose}: Props) {
 
     return(
         <SafeAreaView style={[defaultStyles.container, {flex: 1}]}>
-            
             {
                 step != 1 &&
                 <TouchableOpacity style={styles.chevronBack} onPress={onBackPressed} >
@@ -167,14 +208,14 @@ export default function Onboarding ({onClose}: Props) {
                 scrollEnabled={false}
             >
 
-                <OnboardingCard1 width={ITEM_SIZE} isActive={step === 1} setDisableButton={setDisableButton} setGender={setGender} gender={gender} />
+                <OnboardingCard1 width={ITEM_SIZE} setDisableButton={setDisableButton} setGender={setGender} gender={gender} />
                 <OnboardingCard2 width={ITEM_SIZE} isActive={step === 2} setDisableButton={setDisableButton} setAge={setAge} age={age} />
                 {/* <OnboardingCard3 width={ITEM_SIZE} isActive={step === 3} setDisableButton={setDisableButton} /> */}
                 {/* <OnboardingCard4 width={ITEM_SIZE} isActive={step === 4} /> */}
                 {/* <OnboardingCard5 width={ITEM_SIZE} isActive={step === 5} /> */}
-                <OnboardingCard6 width={ITEM_SIZE} isActive={step === 3} setDisableButton={setDisableButton} setGoals={setGoals} />
-                <OnboardingCard7 width={ITEM_SIZE} isActive={step === 4} setDisableButton={setDisableButton} setScan={setScan} />
-                <OnboardingCard8 width={ITEM_SIZE} isActive={step === 4} setDisableButton={setDisableButton} setScan={setScan} />
+                <OnboardingCard6 width={ITEM_SIZE} isActive={step === 3}  setGoals={setGoals} />
+                <OnboardingCard7 width={ITEM_SIZE} isActive={step === 4}  setScan={setScan} />
+                <OnboardingCard8 width={ITEM_SIZE} step={step === 5} setSkincareRoutine={setSkincareRoutine} skincareRoutine={skincareRoutine} />
             </Animated.ScrollView>
 
             <TouchableOpacity style={[defaultStyles.onboardingButton, disableButton && defaultStyles.disableOnboardingButton ]} onPress={onNextPressed} disabled={disableButton} >

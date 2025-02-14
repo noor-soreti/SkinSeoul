@@ -35,12 +35,13 @@ export const defaultStyles = StyleSheet.create({
         backgroundColor: 'gray',
     },
     onboardingTitle: {
-        fontFamily: 'Roboto',
-        fontWeight: 'bold',
+        fontFamily: 'SCoreDreamBold',
+        // fontWeight: 'bold',
         fontSize: 32,
+        textAlign: 'center'
     },
     onboardingCaption: {
-        fontFamily: 'Inter',
+        fontFamily: 'SCoreDreamRegular',
         color: '#757575',
         textAlign: 'center',
         fontSize: 15,
@@ -90,5 +91,28 @@ export const defaultStyles = StyleSheet.create({
         fontFamily: 'NobileRegular',
         width: '70%',
         fontSize: 10
+    },
+    screenContainer: {
+        flex: 1,
+        backgroundColor: '#fdf1f1',
+    },
+    screenTitle: {
+        fontFamily: 'Nunito Sans',
+        fontSize: 34,
+        fontWeight: 'medium',
+        color: '#100B07'
+    },
+    topContainer: {
+        backgroundColor: '#f8c7cb',
+        paddingTop: '15%',
+        paddingLeft: '5%',
+        paddingRight: '5%',
+        paddingBottom: '5%',
+        borderBottomEndRadius: 30,
+        borderBottomStartRadius: 30,
+        shadowColor: '#e0e0e0e', // Shadow color to match the button for a cohesive look
+        shadowOffset: { width: 0, height: 10 },
+        shadowOpacity: 0.1,
+        shadowRadius: 10,
     }
 })

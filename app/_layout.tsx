@@ -11,11 +11,15 @@ const RootLayout = () => {
   useFonts({
     NobileRegular: require('../assets/fonts/Nobile-Regular.ttf'),
     NobileMedium: require('../assets/fonts/Nobile-Medium.ttf'),
-    NobileBold: require('../assets/fonts/Nobile-Bold.ttf')
+    NobileBold: require('../assets/fonts/Nobile-Bold.ttf'),
+    SCoreDreamRegular: require('../assets/fonts/S_Core_Dream/OTF/SCDream4.otf'),
+    SCoreDreamBold: require('../assets/fonts/S_Core_Dream/OTF/SCDream5.otf'),
   })
 
+  
+
   const onAuthStateChanged = (user: FirebaseAuthTypes.User | null) => {
-    console.log("onAuthStateChanged", user);
+    // console.log("onAuthStateChanged", user);
     setUser(user)
     if (initializing) setInitializing(false)
   }
@@ -40,7 +44,7 @@ const RootLayout = () => {
 
 
   return (
-    <Stack screenOptions={{headerShown: false }} >
+    <Stack initialRouteName="index" screenOptions={{headerShown: false }} >
       <Stack.Screen name='index'/>
       <Stack.Screen name='(public)'/>
       <Stack.Screen name="(tabs)" />

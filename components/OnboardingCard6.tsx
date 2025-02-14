@@ -47,7 +47,7 @@ const OnboardingCard6 = ({width, isActive, setDisableButton, setGoals, goals}: a
 
     return (
         <View style={[defaultStyles.onboardingContainer, {width: width}]} >
-            <Text style={defaultStyles.onboardingTitle} >What are your goals?</Text>
+            <Text style={defaultStyles.onboardingTitle} >What are your skin goals?</Text>
             <Text style={defaultStyles.onboardingCaption}>Choose as many as you want. This will help personalize products to your goals.</Text>
 
             <View ref={viewRef} style={{flex: 1}} onLayout={(e) => setViewHeight(e.nativeEvent.layout.height) }>

@@ -1,79 +1,121 @@
 import { defaultStyles } from "@/constants/Styles";
-import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Alert, FlatList, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useEffect, useState } from "react";
 import OpenAI from "openai";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { zodResponseFormat } from "openai/helpers/zod";
+import { set, z } from "zod";
 
-const OnboardingCard8 = ({width, isActive, setScan}: any) => {
+const OnboardingCard8 = ({width, step, setSkincareRoutine, skincareRoutine}: any) => {
     const [ isLoading, setIsLoading ] = useState(true);
-    const [skincareRoutine, setSkincareRoutine] = useState(null);
 
     useEffect(() => {
-        const fetchRoutine = async () => {
-            const userData = {
-                age: await AsyncStorage.getItem("age"),
-                gender: await AsyncStorage.getItem("gender"),
-                goals: await AsyncStorage.getItem("goals"),
-            }
-
-            await openAICall(userData);
+        if (step) {
+          setIsLoading(false);
+          
+          // const test = async () => {
+          //   try {
+          //     const routine = await AsyncStorage.getItem("skincareRoutine");
+          //     console.log('routine', routine);
+              
+          //   } catch (error) {
+          //     console.error("Error fetching OpenAI API:", error);
+          //     setIsLoading(false); // Ensure loading state is updated even in case of an error
+          //   }
+          // }
+          // test();
+          // const fetchRoutine = async () => {
+          //   const userData = {
+          //       age: await AsyncStorage.getItem("age"),
+          //       gender: await AsyncStorage.getItem("gender"),
+          //       goals: await AsyncStorage.getItem("goals"),
+          //   }
+          //   await openAICall(userData);
+          // }
+          // fetchRoutine();
         }
-        fetchRoutine();
-    }, [])
+    }, [step])
+
+    const RoutineEvent = z.object({
+        morning_routine: z.array(
+          z.object({ step: z.literal("Cleanser"), product: z.string() })
+            .or(z.object({ step: z.literal("Toner"), product: z.string() }))
+            .or(z.object({ step: z.literal("Essence"), product: z.string() }))
+            .or(z.object({ step: z.literal("Moisturizer"), product: z.string() }))
+            .or(z.object({ step: z.literal("Sunscreen"), product: z.string() }))
+        ),
+        evening_routine: z.array(
+          z.object({ step: z.literal("Double Cleanse"), product: z.string() })
+            .or(z.object({ step: z.literal("Cleanser"), product: z.string() }))
+            .or(z.object({ step: z.literal("Toner"), product: z.string() }))
+            .or(z.object({ step: z.literal("Essence"), product: z.string() }))
+            .or(z.object({ step: z.literal("Moisturizer"), product: z.string() }))
+        )
+      });
+      
 
     const openAICall = async (userData: { age: any; gender: any; goals: any}) => {
         try {
             const openai = new OpenAI({
-                apiKey: process.env.EXPO_PUBLIC_OPENAI_API_KEY
+                apiKey: "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"
               });
               
               const response = await openai.chat.completions.create({
                 model: "gpt-4o-mini",
-                response_format: "json",
+                response_format: zodResponseFormat(RoutineEvent, 'event'),
                 messages: [
                     {
                         role: "system",
-                        content: `You are a skincare expert. Generate a personalized Korean skincare routine based on user data in **strict JSON format**.`
+                        content: `You are a Korean skincare expert. Always respond in strict JSON format.
+                                **Output MUST be in JSON format** and follow this exact structure:  
+                                  {
+                                      "morning_routine": [
+                                        { "step": "Cleanser", "product": "Product Name" },
+                                        { "step": "Toner", "product": "Product Name" },
+                                        { "step": "Essence", "product": "Product Name" },
+                                        { "step": "Moisturizer", "product": "Product Name" },
+                                        { "step": "Sunscreen", "product": "Product Name" }
+                                      ],
+                                      "evening_routine": [
+                                        { "step": "Double Cleanse", "product": "Product Name" },
+                                        { "step": "Cleanser", "product": "Product Name" },
+                                        { "step": "Toner", "product": "Product Name" },
+                                        { "step": "Essence", "product": "Product Name" },
+                                        { "step": "Moisturizer", "product": "Product Name" }
+                                      ]
+                                  }`
                     },
                   {
                     role: "user",
                     content: [
                       { 
                         type: "text", 
-                        text: `Create a Korean skincare routine based on the following user details:
+                        text: `Build a Korean skincare routine with only Korean skincare products based on the following user details:
                         - Age: ${userData.age}
                         - Gender: ${userData.gender}
                         - Skincare Goals: ${userData.goals}
-                        The JSON response **must** strictly follow this format:
-                        {
-                        "morning_routine": [
-                            { "step": "Step Name", "product": "Product Name", "description": "Short Description" }
-                        ],
-                        "evening_routine": [
-                            { "step": "Step Name", "product": "Product Name", "description": "Short Description" }
-                        ],
-                        "additional_tips": ["Tip 1", "Tip 2"]
-                        }`
+                        `
                  },
-                      {
-                        type: "image_url",
-                        image_url: {
-                          "url": "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fi.redd.it%2Fx1f4q8vxfty91.jpg&f=1&nofb=1&ipt=945430cbe0baf1b40571fe5799c0be03f2dfb3764b5d196f731cca376ce738f7&ipo=images",
-                        },
-                      },
+                      // {
+                      //   type: "image_url",
+                      //   image_url: {
+                      //     "url": "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fi.redd.it%2Fx1f4q8vxfty91.jpg&f=1&nofb=1&ipt=945430cbe0baf1b40571fe5799c0be03f2dfb3764b5d196f731cca376ce738f7&ipo=images",
+                      //   },
+                      // },
                     ],
                   },
                 ],
                 store: true,
               }).then((e) => {
-                console.log(e.choices[0]);
                 setIsLoading(false);
-                if (e.choices[0].message && e.choices[0].message.content) {
-                    setScan(e.choices[0].message.content[0]);
+                if (e.choices[0].message.content) {
+                  console.log(e.choices[0].message.content);
+                  setSkincareRoutine(e.choices[0].message.content);
                 }
               })
         } catch (error) {
             console.error("Error fetching OpenAI API:", error);
+            Alert.alert("Error fetching OpenAI API");
             setIsLoading(false); // Ensure loading state is updated even in case of an error
         }
     }
@@ -91,7 +133,18 @@ const OnboardingCard8 = ({width, isActive, setScan}: any) => {
     return (
         <View style={[defaultStyles.onboardingContainer, {width: width}]}>
             <Text style={defaultStyles.onboardingTitle} >Finished!</Text>
-            {/* Activity indicator */}
+            <Text style={defaultStyles.onboardingSubTitle} >Here is the currated list of Korean skincare products for you!</Text>
+            
+            <FlatList
+            data={skincareRoutine}
+            renderItem={({item}) => (
+                <>
+                  <Text> {item.morning_routine} </Text>
+                </>
+            )}
+            style={{flex: 1}}
+            />
+
         </View>
     )
 };
