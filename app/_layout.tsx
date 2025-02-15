@@ -14,6 +14,7 @@ const RootLayout = () => {
     NobileBold: require('../assets/fonts/Nobile-Bold.ttf'),
     SCoreDreamRegular: require('../assets/fonts/S_Core_Dream/OTF/SCDream4.otf'),
     SCoreDreamBold: require('../assets/fonts/S_Core_Dream/OTF/SCDream5.otf'),
+    NunitoSans: require('../assets/fonts/Nunito_Sans/static/NunitoSans_7pt-Regular.ttf'),
   })
 
   

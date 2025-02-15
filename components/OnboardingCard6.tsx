@@ -1,5 +1,6 @@
 import { defaultStyles } from "@/constants/Styles";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import React from "react";
 import { useEffect, useRef, useState } from "react";
 import { FlatList, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 

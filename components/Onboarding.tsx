@@ -1,5 +1,4 @@
 import { SafeAreaView, StyleSheet, Text, TouchableOpacity, useWindowDimensions, View } from "react-native";
-import OnboardingBackground from "./OnboardingBackground";
 import Animated, { useAnimatedRef, useDerivedValue, useSharedValue, scrollTo } from "react-native-reanimated";
 import { useEffect, useState } from "react";
 import { defaultStyles } from "@/constants/Styles";
@@ -124,12 +123,12 @@ export default function Onboarding ({onClose}: Props) {
 
     const getGoalsFromAsyncStorage = async () => {
         const getGoals = await getData('goals');
-        // console.log('goals:', getGoals);
+        console.log('goals:', getGoals);
         
         if (getGoals) {
             setGoals(JSON.parse(getGoals));
             setDisableButton(false);
-        }
+        } 
     }
 
     const getScanFromAsyncStorage = async () => {

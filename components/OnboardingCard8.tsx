@@ -1,3 +1,4 @@
+import React from "react";
 import { defaultStyles } from "@/constants/Styles";
 import { ActivityIndicator, Alert, FlatList, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useEffect, useState } from "react";
@@ -12,27 +13,26 @@ const OnboardingCard8 = ({width, step, setSkincareRoutine, skincareRoutine}: any
     useEffect(() => {
         if (step) {
           setIsLoading(false);
-          
-          // const test = async () => {
-          //   try {
-          //     const routine = await AsyncStorage.getItem("skincareRoutine");
-          //     console.log('routine', routine);
+          const test = async () => {
+            try {
+              const routine = await AsyncStorage.getItem("skincareRoutine");
+              console.log('routine', routine);
               
-          //   } catch (error) {
-          //     console.error("Error fetching OpenAI API:", error);
-          //     setIsLoading(false); // Ensure loading state is updated even in case of an error
-          //   }
-          // }
-          // test();
-          // const fetchRoutine = async () => {
-          //   const userData = {
-          //       age: await AsyncStorage.getItem("age"),
-          //       gender: await AsyncStorage.getItem("gender"),
-          //       goals: await AsyncStorage.getItem("goals"),
-          //   }
-          //   await openAICall(userData);
-          // }
-          // fetchRoutine();
+            } catch (error) {
+              console.error("Error fetching OpenAI API:", error);
+              setIsLoading(false); // Ensure loading state is updated even in case of an error
+            }
+          }
+          test();
+          const fetchRoutine = async () => {
+            const userData = {
+                age: await AsyncStorage.getItem("age"),
+                gender: await AsyncStorage.getItem("gender"),
+                goals: await AsyncStorage.getItem("goals"),
+            }
+            await openAICall(userData);
+          }
+          fetchRoutine();
         }
     }, [step])
 

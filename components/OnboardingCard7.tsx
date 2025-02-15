@@ -1,6 +1,6 @@
 import { defaultStyles } from "@/constants/Styles"
 import { useState } from "react"
-import { ActivityIndicator, Button, Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native"
+import { Button, StyleSheet, View } from "react-native"
 import * as ImagePicker from 'expo-image-picker';
 import { Image } from "expo-image";
 

@@ -4,11 +4,18 @@ import { getData } from "@/storageHelper"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import { useEffect, useState } from "react"
 import { Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native"
+import Calendar from '@/components/Calendar'
+import ScanButton from '@/components/ScanButton'
+import { Camera, CameraType, CameraView, useCameraPermissions } from 'expo-camera'
+import { Ionicons } from '@expo/vector-icons'
 
 const IS_ONBOARDED = "IS_ONBOARDED"
 
 const HomeScreen = () => {
     const [ showOnboarding, setShowOnboarding ] = useState(false)
+    const [selectedDate, setSelectedDate] = useState(new Date())
+    const [showCamera, setShowCamera] = useState(false)
+    const [permission, requestPermission] = useCameraPermissions()
     
     useEffect(() => {
         async function checkFirstLaunch() {
@@ -35,15 +42,30 @@ const HomeScreen = () => {
         setShowOnboarding(false)
     }
 
+    const handleDateSelect = (date: Date) => {
+        setSelectedDate(date);
+        // Here you can add logic to fetch products for the selected date
+    };
+
+    const handleScan = async () => {
+        if (!permission?.granted) {
+            const { granted } = await requestPermission();
+            if (!granted) return;
+        }
+        setShowCamera(true);
+    };
+
     return (
         <View style={defaultStyles.screenContainer}>
             
             <View style={defaultStyles.topContainer}>
-                <Text style={defaultStyles.screenTitle} >Daily Skincare Routine</Text>
-
-                <View>
-                    <Text>CALENDAR</Text>
+                <View style={styles.titleContainer}>
+                    <Text style={defaultStyles.screenTitle} >Your Daily Skincare Routine</Text>
+                    <ScanButton onPressScan={handleScan} />
                 </View>
+
+                <Calendar onDateSelect={handleDateSelect} />
+                
             </View>
 
             <View style={{padding: '5%'}}>
@@ -63,6 +85,22 @@ const HomeScreen = () => {
                 onRequestClose={() => setShowOnboarding(false)}
             >
                 <Onboarding onClose={onFirstLaunchClosed} />
+            </Modal>
+
+            <Modal
+                animationType="slide"
+                presentationStyle="fullScreen"
+                visible={showCamera}
+                onRequestClose={() => setShowCamera(false)}
+            >
+                <CameraView style={StyleSheet.absoluteFill} >
+                    <TouchableOpacity 
+                        style={styles.closeCamera}
+                        onPress={() => setShowCamera(false)}
+                    >
+                        <Ionicons name="close" size={30} color="white" />
+                    </TouchableOpacity>
+                </CameraView>
             </Modal>
         </View>
     )
@@ -92,5 +130,17 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         borderRadius: 15,
         color: '#758599'
-    }
+    },
+    titleContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        width: '100%',
+        // justifyContent: 'space-between',
+    },
+    closeCamera: {
+        position: 'absolute',
+        top: 40,
+        right: 20,
+        padding: 10,
+    },
 })
