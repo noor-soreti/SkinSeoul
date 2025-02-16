@@ -2,22 +2,37 @@ import { useFonts } from "expo-font";
 import { Stack, useRouter, useSegments } from "expo-router";
 import { useEffect, useState } from "react";
 import auth, { FirebaseAuthTypes } from '@react-native-firebase/auth';
+import * as SplashScreen from 'expo-splash-screen';
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
+
+// Prevent the splash screen from auto-hiding
+// SplashScreen.preventAutoHideAsync();
+
+// Add near the top, before RootLayout component
+GoogleSignin.configure({
+  iosClientId: '294543918032-oljer5medbughcn7mrvaql1qglve6o9u.apps.googleusercontent.com', // This should match your CLIENT_ID from GoogleService-Info.plist
+});
 
 const RootLayout = () => {
   const [ initializing, setInitializing ] = useState(true); // used to track whether Firebase Authentication is finished determining user's auth status
   const [ user, setUser ] = useState<FirebaseAuthTypes.User | null>();
   const router = useRouter();
   const segment = useSegments();
-  useFonts({
+  const [fontsLoaded] = useFonts({
     NobileRegular: require('../assets/fonts/Nobile-Regular.ttf'),
     NobileMedium: require('../assets/fonts/Nobile-Medium.ttf'),
     NobileBold: require('../assets/fonts/Nobile-Bold.ttf'),
     SCoreDreamRegular: require('../assets/fonts/S_Core_Dream/OTF/SCDream4.otf'),
     SCoreDreamBold: require('../assets/fonts/S_Core_Dream/OTF/SCDream5.otf'),
     NunitoSans: require('../assets/fonts/Nunito_Sans/static/NunitoSans_7pt-Regular.ttf'),
-  })
+  });
 
-  
+  // useEffect(() => {
+  //   if (fontsLoaded && !initializing) {
+  //     // Hide splash screen once fonts are loaded and Firebase is initialized
+  //     SplashScreen.hideAsync();
+  //   }
+  // }, [fontsLoaded, initializing]);
 
   const onAuthStateChanged = (user: FirebaseAuthTypes.User | null) => {
     // console.log("onAuthStateChanged", user);

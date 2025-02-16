@@ -3,10 +3,23 @@ import LogInButton from "@/components/LogInButton";
 import { defaultStyles } from "@/constants/Styles";
 import { router } from "expo-router";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
+import auth from '@react-native-firebase/auth';
+
+const signInWithGoogle = async () => {
+  try {
+    await GoogleSignin.signIn();
+    const { accessToken, idToken } = await GoogleSignin.getTokens();
+    const googleCredential = auth.GoogleAuthProvider.credential(idToken);
+    return auth().signInWithCredential(googleCredential);
+  } catch (error: any) {
+    console.error('Google Sign-In Error:', error);
+  }
+};
 
 const buttonItems = [
   {title: "Sign in with Apple", onPressFunction: () => { console.log("Apple") }},
-  {title: "Sign in with Google", onPressFunction: () => {console.log("Google")}},
+  {title: "Sign in with Google", onPressFunction: signInWithGoogle},
   {title: "Sign in with Email", onPressFunction: () => router.push("/(public)/emailSignIn")},
 ]
 

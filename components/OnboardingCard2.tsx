@@ -39,7 +39,7 @@ const OnboardingCard2 = ({width, isActive, setDisableButton, setAge, age}: any) 
                 selectedIndex={selectedIndex}
                 renderItem={(data, index) => {
                     return (
-                    <View>
+                    <View style={{width: 100, alignItems: 'center'}}>
                         <Text style={ index == selectedIndex ? styles.activeItem : styles.item } >{data}</Text>
                     </View>
                     )

@@ -3,11 +3,7 @@ import Animated, { useAnimatedRef, useDerivedValue, useSharedValue, scrollTo } f
 import { useEffect, useState } from "react";
 import { defaultStyles } from "@/constants/Styles";
 import Entypo from '@expo/vector-icons/Entypo';
-import OnboardingCard1 from "./OnboardingCard1";
 import OnboardingCard2 from "./OnboardingCard2";
-import OnboardingCard3 from "./OnboardingCard3";
-import OnboardingCard4 from "./OnboardingCard4";
-import OnboardingCard5 from "./OnboardingCard5";
 import OnboardingCard6 from "./OnboardingCard6";
 import { router } from "expo-router";
 import OnboardingCard7 from "./OnboardingCard7";
@@ -27,13 +23,12 @@ export default function Onboarding ({onClose}: Props) {
 
     const [ disableButton, setDisableButton ] = useState(true);
 
-    const [ gender, setGender ] = useState<string | null>(null)
     const [ age, setAge ] = useState<string | null>(null)
     const [ goals, setGoals ] = useState<Array<string> | null>([])
     const [ scan, setScan ] = useState<string | null>(null)
     const [ skincareRoutine, setSkincareRoutine ] = useState<any | null>([])
 
-    const STEP_COUNT = 5;
+    const STEP_COUNT = 4;
     const ITEM_SIZE = screenSize.width;
 
     useEffect(() => {
@@ -53,17 +48,8 @@ export default function Onboarding ({onClose}: Props) {
     });
 
     useEffect(() => {
-        // triggers whenever gender is updated
-        if (gender) {
-            (async () => {
-                await storeData("gender", gender);
-            })();
-        }
-    }, [gender]);
-
-    useEffect(() => {
         // triggers whenever age is updated
-        // console.log('age:', age);
+        console.log('age:', age);
         if (age) {
             (async () => {
                 await storeData("age", age);
@@ -75,6 +61,7 @@ export default function Onboarding ({onClose}: Props) {
         // triggers whenever goals is updated
         // console.log('goals:', goals);
         if (goals) {
+            console.log('goals:', goals);
             (async () => {
                 await storeData("goals", JSON.stringify(goals));
             })();
@@ -101,21 +88,11 @@ export default function Onboarding ({onClose}: Props) {
         }
     }, [skincareRoutine])
 
-    const getGenderFromAsyncStorage = async () => {        
-        const getGender = await getData('gender');
-        // console.log('gender:', getGender);
-        
-        if (getGender) {
-            setGender(getGender);
-            setDisableButton(false);
-        }
-    }
-
     const getAgeFromAsyncStorage = async () => {
         const getAge = await getData('age');
-        // console.log('age:', getAge);
         
         if (getAge) {
+            console.log('age:', getAge);
             setAge(getAge);
             setDisableButton(false);
         }
@@ -123,17 +100,19 @@ export default function Onboarding ({onClose}: Props) {
 
     const getGoalsFromAsyncStorage = async () => {
         const getGoals = await getData('goals');
-        console.log('goals:', getGoals);
         
         if (getGoals) {
+            console.log('goals:', getGoals);
             setGoals(JSON.parse(getGoals));
             setDisableButton(false);
         } 
     }
 
     const getScanFromAsyncStorage = async () => {
-        const getScan = await getData('scan');        
+        const getScan = await getData('scan');   
+
         if (getScan) {
+            console.log('scan:', getScan);
             setScan(getScan);
             setDisableButton(false);
         }
@@ -153,19 +132,17 @@ export default function Onboarding ({onClose}: Props) {
     useEffect(() => {    
         switch (step) {
             case 1:
-                getGenderFromAsyncStorage();
-                break;
-            case 2:
                 getAgeFromAsyncStorage();
                 break;
-            case 3: 
+            case 2: 
                 getGoalsFromAsyncStorage();
                 break;
-            case 4:             
+            case 3:             
                 getScanFromAsyncStorage();
                 break;
-            case 5:
+            case 4:
                 getSkincareRoutineFromAsyncStorage();
+                break;
             default:
                 break;
         }
@@ -201,20 +178,14 @@ export default function Onboarding ({onClose}: Props) {
                 style={{
                     flex: 1,
                     flexDirection: 'row',
-                    // paddingVertical: 20
                 }}
                 horizontal
                 scrollEnabled={false}
             >
-
-                <OnboardingCard1 width={ITEM_SIZE} setDisableButton={setDisableButton} setGender={setGender} gender={gender} />
-                <OnboardingCard2 width={ITEM_SIZE} isActive={step === 2} setDisableButton={setDisableButton} setAge={setAge} age={age} />
-                {/* <OnboardingCard3 width={ITEM_SIZE} isActive={step === 3} setDisableButton={setDisableButton} /> */}
-                {/* <OnboardingCard4 width={ITEM_SIZE} isActive={step === 4} /> */}
-                {/* <OnboardingCard5 width={ITEM_SIZE} isActive={step === 5} /> */}
-                <OnboardingCard6 width={ITEM_SIZE} isActive={step === 3}  setGoals={setGoals} />
-                <OnboardingCard7 width={ITEM_SIZE} isActive={step === 4}  setScan={setScan} />
-                <OnboardingCard8 width={ITEM_SIZE} step={step === 5} setSkincareRoutine={setSkincareRoutine} skincareRoutine={skincareRoutine} />
+                <OnboardingCard2 width={ITEM_SIZE} isActive={step === 1} setDisableButton={setDisableButton} setAge={setAge} age={age} />
+                <OnboardingCard6 width={ITEM_SIZE} isActive={step === 2} setGoals={setGoals} goals={goals} />
+                <OnboardingCard7 width={ITEM_SIZE} isActive={step === 3} setScan={setScan} />
+                <OnboardingCard8 width={ITEM_SIZE} step={step === 4} setSkincareRoutine={setSkincareRoutine} skincareRoutine={skincareRoutine} />
             </Animated.ScrollView>
 
             <TouchableOpacity style={[defaultStyles.onboardingButton, disableButton && defaultStyles.disableOnboardingButton ]} onPress={onNextPressed} disabled={disableButton} >

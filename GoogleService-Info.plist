@@ -3,21 +3,21 @@
 <plist version="1.0">
 <dict>
 	<key>CLIENT_ID</key>
-	<string>76958032517-ngr4k3lomoosqme93v756ui7ro520im9.apps.googleusercontent.com</string>
+	<string>294543918032-oljer5medbughcn7mrvaql1qglve6o9u.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.76958032517-ngr4k3lomoosqme93v756ui7ro520im9</string>
+	<string>com.googleusercontent.apps.294543918032-oljer5medbughcn7mrvaql1qglve6o9u</string>
 	<key>API_KEY</key>
-	<string>AIzaSyC7zJRYEbeKzYazkANv_LOsLfPH7EYkJsc</string>
+	<string>AIzaSyAyAOIVMe791iN0rTmlawOdFI2tlj2j0g8</string>
 	<key>GCM_SENDER_ID</key>
-	<string>76958032517</string>
+	<string>294543918032</string>
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
 	<string>com.noorsoreti.SkinSeoul</string>
 	<key>PROJECT_ID</key>
-	<string>skinseoul-c12f8</string>
+	<string>skinseoulai</string>
 	<key>STORAGE_BUCKET</key>
-	<string>skinseoul-c12f8.firebasestorage.app</string>
+	<string>skinseoulai.firebasestorage.app</string>
 	<key>IS_ADS_ENABLED</key>
 	<false></false>
 	<key>IS_ANALYTICS_ENABLED</key>
@@ -29,6 +29,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:76958032517:ios:7601216bc592fbb2387fec</string>
+	<string>1:294543918032:ios:2d7c44fb3d7c9e5b62efd5</string>
 </dict>
 </plist>

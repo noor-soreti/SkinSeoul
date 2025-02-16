@@ -13,7 +13,14 @@
       "bundleIdentifier": "com.noorsoreti.SkinSeoul",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
-        "NSCameraUsageDescription": "We need camera access to analyze your skin using AI and recommend the best skincare routine and products tailored to you."
+        "NSCameraUsageDescription": "We need camera access to analyze your skin using AI and recommend the best skincare routine and products tailored to you.",
+        "CFBundleURLTypes": [
+          {
+            "CFBundleURLSchemes": [
+              "com.googleusercontent.apps.294543918032-oljer5medbughcn7mrvaql1qglve6o9u"
+            ]
+          }
+        ]
       },
       "googleServicesFile": "./GoogleService-Info.plist"
     },
@@ -59,6 +66,14 @@
         "expo-image-picker",
         {
           "photosPermission": "The app accesses your photos to let you upload your pictures."
+        }
+      ],
+      ["@react-native-google-signin/google-signin"],
+      [
+        "expo-media-library",
+        {
+          "photosPermission": "Allow $(PRODUCT_NAME) to access your photos to save skin analysis images.",
+          "savePhotosPermission": "Allow $(PRODUCT_NAME) to save photos to use for skin analysis."
         }
       ]
     ],
