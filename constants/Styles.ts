@@ -1,4 +1,5 @@
 import { StyleSheet } from "react-native";
+import { ColorPalette } from "./Colors";
 
 export const defaultStyles = StyleSheet.create({
     container: {
@@ -24,7 +25,7 @@ export const defaultStyles = StyleSheet.create({
     },
     onboardingButton: {
         width: '90%',
-        backgroundColor: '#ED6672',
+        backgroundColor: ColorPalette.primary,
         padding: 20,
         borderRadius: 10,
         // bottom: 0,
@@ -36,9 +37,7 @@ export const defaultStyles = StyleSheet.create({
     },
     onboardingTitle: {
         fontFamily: 'SCoreDreamBold',
-        // fontWeight: 'bold',
         fontSize: 32,
-        textAlign: 'center'
     },
     onboardingCaption: {
         fontFamily: 'SCoreDreamRegular',
@@ -94,29 +93,26 @@ export const defaultStyles = StyleSheet.create({
     },
     screenContainer: {
         flex: 1,
-        backgroundColor: '#fdf1f1',
+        backgroundColor: ColorPalette.tertiary,
     },
     screenTitle: {
         fontFamily: 'NunitoSans',
         fontSize: 30,
         fontWeight: 'medium',
-        color: '#100B07',
+        color: ColorPalette.white,
         paddingBottom: 10,
         flex: 1,
         flexWrap: 'wrap',
         paddingRight: 10,
     },
     topContainer: {
-        backgroundColor: '#f8c3cb',
+        height: 250,
+        // backgroundColor: ColorPalette.primary,
         paddingTop: '15%',
         paddingLeft: '5%',
         paddingRight: '5%',
         paddingBottom: '5%',
         borderBottomEndRadius: 40,
         borderBottomStartRadius: 40,
-        shadowColor: '#e0e0e0e', // Shadow color to match the button for a cohesive look
-        shadowOffset: { width: 0, height: 10 },
-        shadowOpacity: 0.1,
-        shadowRadius: 10,
     }
 })

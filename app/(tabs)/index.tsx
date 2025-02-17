@@ -2,12 +2,13 @@ import Onboarding from "@/components/Onboarding"
 import { defaultStyles } from "@/constants/Styles"
 import { getData } from "@/storageHelper"
 import AsyncStorage from "@react-native-async-storage/async-storage"
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import { Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native"
 import Calendar from '@/components/Calendar'
 import ScanButton from '@/components/ScanButton'
 import { Camera, CameraType, CameraView, useCameraPermissions } from 'expo-camera'
-import { Ionicons } from '@expo/vector-icons'
+import LinearGradientSection from "@/components/LinearGradientSection"
+import CameraComponent from '@/components/CameraComponent'
 
 const IS_ONBOARDED = "IS_ONBOARDED"
 
@@ -16,10 +17,13 @@ const HomeScreen = () => {
     const [selectedDate, setSelectedDate] = useState(new Date())
     const [showCamera, setShowCamera] = useState(false)
     const [permission, requestPermission] = useCameraPermissions()
+    const textRef = useRef<Text>(null)
+    const [capturedImage, setCapturedImage] = useState<string | null>(null)
     
     useEffect(() => {
         async function checkFirstLaunch() {
-            await AsyncStorage.clear();
+            await AsyncStorage.clear()
+            // await AsyncStorage.setItem(IS_ONBOARDED, 'true')
             const firstLaunch = await AsyncStorage.getItem(IS_ONBOARDED);
             if (!firstLaunch) {
                 setShowOnboarding(true);
@@ -56,17 +60,26 @@ const HomeScreen = () => {
         setShowCamera(true);
     };
 
+    const handleImageCaptured = (imageUri: string, savedUri: string) => {
+        setCapturedImage(imageUri);
+        console.log('Photo captured:', imageUri);
+        console.log('Photo saved to:', savedUri);
+        setShowCamera(false);
+    };
+
     return (
         <View style={defaultStyles.screenContainer}>
-            
-            <View style={defaultStyles.topContainer}>
+            <LinearGradientSection>
+            <View style={[defaultStyles.topContainer, styles.topContainerAdjust]}>
                 <View style={styles.titleContainer}>
-                    <Text style={defaultStyles.screenTitle} >Your Daily Skincare Routine</Text>
+                    <Text ref={textRef} style={defaultStyles.screenTitle}>Your Daily Skincare Routine</Text>
                     <ScanButton onPressScan={handleScan} />
-                </View>
+                </View>                
+            </View>
+            </LinearGradientSection>
 
+            <View style={styles.calendarWrapper}>
                 <Calendar onDateSelect={handleDateSelect} />
-                
             </View>
 
             <View style={{padding: '5%'}}>
@@ -88,21 +101,11 @@ const HomeScreen = () => {
                 <Onboarding onClose={onFirstLaunchClosed} />
             </Modal>
 
-            <Modal
-                animationType="slide"
-                presentationStyle="fullScreen"
-                visible={showCamera}
-                onRequestClose={() => setShowCamera(false)}
-            >
-                <CameraView style={StyleSheet.absoluteFill} >
-                    <TouchableOpacity 
-                        style={styles.closeCamera}
-                        onPress={() => setShowCamera(false)}
-                    >
-                        <Ionicons name="close" size={30} color="white" />
-                    </TouchableOpacity>
-                </CameraView>
-            </Modal>
+            <CameraComponent 
+                isVisible={showCamera}
+                onClose={() => setShowCamera(false)}
+                onImageCaptured={handleImageCaptured}
+            />
         </View>
     )
 }
@@ -136,12 +139,40 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         width: '100%',
-        // justifyContent: 'space-between',
+        marginBottom: 20,
     },
     closeCamera: {
         position: 'absolute',
         top: 40,
         right: 20,
         padding: 10,
+    },
+    topContainerAdjust: {
+        paddingBottom: 60,
+    },
+    calendarWrapper: {
+        marginHorizontal: 25,
+        borderRadius: 18,
+        backgroundColor: 'white',
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.1,
+        shadowRadius: 8,
+        elevation: 5,
+        marginTop: -90,
+    },
+    captureButton: {
+        position: 'absolute',
+        bottom: 50,
+        alignSelf: 'center',
+        width: 70,
+        height: 70,
+        borderRadius: 35,
+        backgroundColor: 'white',
+        borderWidth: 5,
+        borderColor: 'rgba(255, 255, 255, 0.5)',
     },
 })

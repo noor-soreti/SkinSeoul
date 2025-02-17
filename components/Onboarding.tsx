@@ -31,18 +31,6 @@ export default function Onboarding ({onClose}: Props) {
     const STEP_COUNT = 4;
     const ITEM_SIZE = screenSize.width;
 
-    useEffect(() => {
-        
-        const test = async () => {
-            console.log('getAsyncRoutine', await AsyncStorage.getItem('skincareRoutine'));
-            
-        }
-
-        test()
-        
-        
-    }, [])
-
     useDerivedValue(() => {
         scrollTo(animatedRef, stepScroll.value * (ITEM_SIZE ), 0, true);
     });
@@ -59,24 +47,22 @@ export default function Onboarding ({onClose}: Props) {
     
     useEffect(() => {
         // triggers whenever goals is updated
-        // console.log('goals:', goals);
         if (goals) {
-            console.log('goals:', goals);
             (async () => {
                 await storeData("goals", JSON.stringify(goals));
             })();
         }
     }, [goals]);
 
-    useEffect(() => {
-        // triggers whenever scan is updated
-        console.log('scan:', scan);
-        if (scan) {
-            (async () => {
-                await storeData("scan", scan);
-            })();
-        }
-    }, [scan]);
+    // useEffect(() => {
+    //     // triggers whenever scan is updated
+    //     console.log('scan:', scan);
+    //     if (scan) {
+    //         (async () => {
+    //             await storeData("scan", scan);
+    //         })();
+    //     }
+    // }, [scan]);
 
     useEffect(() => {
         // triggers whenever skincareRoutine is updated
@@ -92,36 +78,36 @@ export default function Onboarding ({onClose}: Props) {
         const getAge = await getData('age');
         
         if (getAge) {
-            console.log('age:', getAge);
+            console.log('asyncAge:', getAge);
             setAge(getAge);
             setDisableButton(false);
         }
     }
 
     const getGoalsFromAsyncStorage = async () => {
-        const getGoals = await getData('goals');
+        const getGoals = await getObject('goals');                
         
-        if (getGoals) {
-            console.log('goals:', getGoals);
-            setGoals(JSON.parse(getGoals));
+        if (getGoals && getGoals.length > 0) {
+            console.log('asyncGoals:', getGoals);
             setDisableButton(false);
+            setGoals(JSON.parse(getGoals));
         } 
     }
 
-    const getScanFromAsyncStorage = async () => {
-        const getScan = await getData('scan');   
+    // const getScanFromAsyncStorage = async () => {
+    //     const getScan = await getData('scan');   
 
-        if (getScan) {
-            console.log('scan:', getScan);
-            setScan(getScan);
-            setDisableButton(false);
-        }
-    }
+    //     if (getScan) {
+    //         console.log('asyncScan:', getScan);
+    //         setScan(getScan);
+    //         setDisableButton(false);
+    //     }
+    // }
 
     const getSkincareRoutineFromAsyncStorage = async () => {
         const getSkincareRoutine = await AsyncStorage.getItem('skincareRoutine');
         if (getSkincareRoutine != null) {
-            console.log('generated routine:', getSkincareRoutine);
+            console.log('asyncSkincareRoutine:', getSkincareRoutine);
             if (getSkincareRoutine) {
                 setSkincareRoutine(getSkincareRoutine);
                 setDisableButton(false);
@@ -138,7 +124,7 @@ export default function Onboarding ({onClose}: Props) {
                 getGoalsFromAsyncStorage();
                 break;
             case 3:             
-                getScanFromAsyncStorage();
+                // getScanFromAsyncStorage();
                 break;
             case 4:
                 getSkincareRoutineFromAsyncStorage();
@@ -183,7 +169,7 @@ export default function Onboarding ({onClose}: Props) {
                 scrollEnabled={false}
             >
                 <OnboardingCard2 width={ITEM_SIZE} isActive={step === 1} setDisableButton={setDisableButton} setAge={setAge} age={age} />
-                <OnboardingCard6 width={ITEM_SIZE} isActive={step === 2} setGoals={setGoals} goals={goals} />
+                <OnboardingCard6 width={ITEM_SIZE} isActive={step === 2} setDisableButton={setDisableButton} setGoals={setGoals} goals={goals} />
                 <OnboardingCard7 width={ITEM_SIZE} isActive={step === 3} setScan={setScan} />
                 <OnboardingCard8 width={ITEM_SIZE} step={step === 4} setSkincareRoutine={setSkincareRoutine} skincareRoutine={skincareRoutine} />
             </Animated.ScrollView>

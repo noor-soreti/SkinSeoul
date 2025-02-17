@@ -1,5 +1,4 @@
 import { defaultStyles } from "@/constants/Styles";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { useEffect, useRef, useState } from "react";
 import { FlatList, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { getData } from "@/storageHelper";
@@ -22,28 +21,34 @@ const GOALS = [
     { title: "Practice facial yoga (coming soon) 🧘‍♂️" },
 ]
 
-const OnboardingCard6 = ({width, isActive, setGoals, goals}: any) => {
+const OnboardingCard6 = ({width, isActive, setGoals, goals, setDisableButton}: any) => {
     const viewRef = useRef(null);
-    const buttonRef = useRef(null);
     const [ viewHeight, setViewHeight ] = useState(0)
-    const [ buttonHeight, setButtonHeight ] = useState(0); 
-    const [ disableButton, setDisableButton ] = useState(true);
+
+    useEffect(() => {
+        if (goals.length > 0) {
+            setDisableButton(false);
+        } else {
+            setDisableButton(true);
+        }
+    }, [goals])
 
     useEffect(() => {
         if (isActive) {
             const test = async () => {
                 console.log(await getData('goals'));
-                console.log('goals', goals);
+                console.log('goloa', goals);
             }
             test();
         }
-    }, [])
+    }, [isActive])
 
     const handleSelectedGoal = (goal: string) => {
+
         setGoals((prevGoals: string[]) => {
             if (prevGoals.includes(goal)) {
                 const newGoals = prevGoals.filter(g => g !== goal);
-                setGoals(newGoals);
+                setGoals(prevGoals.filter(g => g !== goal))
                 return newGoals;
             } else {
                 if (prevGoals.length >= 5) return prevGoals;
@@ -54,11 +59,11 @@ const OnboardingCard6 = ({width, isActive, setGoals, goals}: any) => {
         });
     };
 
-    useEffect(() => {
-        if (isActive) {
-            setDisableButton(goals.length === 0);
-        }
-    }, [goals, isActive]);
+    // useEffect(() => {
+    //     if (isActive) {
+    //         setDisableButton(goals.length === 0);
+    //     }
+    // }, [goals, isActive]);
 
     const renderGoalItem = ({ item }: { item: { title: string } }) => (
         <TouchableOpacity
@@ -82,13 +87,10 @@ const OnboardingCard6 = ({width, isActive, setGoals, goals}: any) => {
                     data={GOALS}
                     renderItem={renderGoalItem}
                     keyExtractor={item => item.title}
-                    style={{maxHeight: viewHeight - buttonHeight - 15 }}
+                    style={{maxHeight: viewHeight - 15 }}
                 />
             </View>
             
-            {/* <TouchableOpacity ref={buttonRef} style={defaultStyles.onboardingButton} onLayout={(e) => setButtonHeight(e.nativeEvent.layout.height)}>
-                <Text style={defaultStyles.onboardingButtonText} >Continue</Text>
-            </TouchableOpacity> */}
         </View>
     )
 };

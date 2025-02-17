@@ -152,7 +152,6 @@ const styles = StyleSheet.create({
     container: {
         backgroundColor: '#FFFFFF',
         paddingTop: 10,
-        // padding: 10,
         borderRadius: 18,
     },
     dropdownContainer: {
@@ -202,6 +201,14 @@ const styles = StyleSheet.create({
     },
     selectedDate: {
         backgroundColor: '#FF909A',
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 1,
+            height: 4,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+        elevation: 5, // This is for Android shadow
     },
     dateNumber: {
         fontSize: 20,

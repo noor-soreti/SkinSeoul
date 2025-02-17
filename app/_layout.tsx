@@ -18,13 +18,14 @@ const RootLayout = () => {
   const [ user, setUser ] = useState<FirebaseAuthTypes.User | null>();
   const router = useRouter();
   const segment = useSegments();
-  const [fontsLoaded] = useFonts({
+  useFonts({
     NobileRegular: require('../assets/fonts/Nobile-Regular.ttf'),
     NobileMedium: require('../assets/fonts/Nobile-Medium.ttf'),
     NobileBold: require('../assets/fonts/Nobile-Bold.ttf'),
     SCoreDreamRegular: require('../assets/fonts/S_Core_Dream/OTF/SCDream4.otf'),
     SCoreDreamBold: require('../assets/fonts/S_Core_Dream/OTF/SCDream5.otf'),
     NunitoSans: require('../assets/fonts/Nunito_Sans/static/NunitoSans_7pt-Regular.ttf'),
+    FreesentaionRegular: require('../assets/fonts/Freesentation/Freesentation-4Regular.ttf'),
   });
 
   // useEffect(() => {
