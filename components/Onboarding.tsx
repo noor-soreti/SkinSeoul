@@ -24,7 +24,7 @@ export default function Onboarding ({onClose}: Props) {
     const [ disableButton, setDisableButton ] = useState(true);
 
     const [ age, setAge ] = useState<string | null>(null)
-    const [ goals, setGoals ] = useState<Array<string> | null>([])
+    const [ goals, setGoals ] = useState<Array<string>>([])
     const [ scan, setScan ] = useState<string | null>(null)
     const [ skincareRoutine, setSkincareRoutine ] = useState<any | null>([])
 
@@ -54,21 +54,21 @@ export default function Onboarding ({onClose}: Props) {
         }
     }, [goals]);
 
-    // useEffect(() => {
-    //     // triggers whenever scan is updated
-    //     console.log('scan:', scan);
-    //     if (scan) {
-    //         (async () => {
-    //             await storeData("scan", scan);
-    //         })();
-    //     }
-    // }, [scan]);
+    useEffect(() => {
+        // triggers whenever scan is updated
+        console.log('scan:', scan);
+        if (scan) {
+            (async () => {
+                await storeData("scan", scan);
+            })();
+        }
+    }, [scan]);
 
     useEffect(() => {
         // triggers whenever skincareRoutine is updated
         if (skincareRoutine) {
             (async () => {
-                console.log('skincareRoutine:', skincareRoutine);
+                // console.log('skincareRoutine:', skincareRoutine);
                 storeObject("skincareRoutine", skincareRoutine);
             })();
         }
@@ -94,18 +94,18 @@ export default function Onboarding ({onClose}: Props) {
         } 
     }
 
-    // const getScanFromAsyncStorage = async () => {
-    //     const getScan = await getData('scan');   
+    const getScanFromAsyncStorage = async () => {
+        const getScan = await getData('scan');   
 
-    //     if (getScan) {
-    //         console.log('asyncScan:', getScan);
-    //         setScan(getScan);
-    //         setDisableButton(false);
-    //     }
-    // }
+        if (getScan) {
+            console.log('asyncScan:', getScan);
+            setScan(getScan);
+            setDisableButton(false);
+        }
+    }
 
     const getSkincareRoutineFromAsyncStorage = async () => {
-        const getSkincareRoutine = await AsyncStorage.getItem('skincareRoutine');
+        const getSkincareRoutine = await getObject('skincareRoutine');
         if (getSkincareRoutine != null) {
             console.log('asyncSkincareRoutine:', getSkincareRoutine);
             if (getSkincareRoutine) {
@@ -124,7 +124,7 @@ export default function Onboarding ({onClose}: Props) {
                 getGoalsFromAsyncStorage();
                 break;
             case 3:             
-                // getScanFromAsyncStorage();
+                getScanFromAsyncStorage();
                 break;
             case 4:
                 getSkincareRoutineFromAsyncStorage();
@@ -170,7 +170,7 @@ export default function Onboarding ({onClose}: Props) {
             >
                 <OnboardingCard2 width={ITEM_SIZE} isActive={step === 1} setDisableButton={setDisableButton} setAge={setAge} age={age} />
                 <OnboardingCard6 width={ITEM_SIZE} isActive={step === 2} setDisableButton={setDisableButton} setGoals={setGoals} goals={goals} />
-                <OnboardingCard7 width={ITEM_SIZE} isActive={step === 3} setScan={setScan} />
+                <OnboardingCard7 width={ITEM_SIZE} isActive={step === 3} setDisableButton={setDisableButton} setScan={setScan} />
                 <OnboardingCard8 width={ITEM_SIZE} step={step === 4} setSkincareRoutine={setSkincareRoutine} skincareRoutine={skincareRoutine} />
             </Animated.ScrollView>
 

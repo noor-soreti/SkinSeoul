@@ -21,7 +21,15 @@ const GOALS = [
     { title: "Practice facial yoga (coming soon) 🧘‍♂️" },
 ]
 
-const OnboardingCard6 = ({width, isActive, setGoals, goals, setDisableButton}: any) => {
+interface OnboardingCard6Props {
+    width: number;
+    isActive: boolean;
+    setGoals: (goals: string[]) => void;
+    goals: string[];
+    setDisableButton: (disableButton: boolean) => void;
+}
+
+const OnboardingCard6 = ({width, isActive, setGoals, goals, setDisableButton}: OnboardingCard6Props) => {
     const viewRef = useRef(null);
     const [ viewHeight, setViewHeight ] = useState(0)
 
@@ -44,19 +52,25 @@ const OnboardingCard6 = ({width, isActive, setGoals, goals, setDisableButton}: a
     }, [isActive])
 
     const handleSelectedGoal = (goal: string) => {
+        if (goals.includes(goal)) {
+            setGoals(goals.filter(g => g !== goal));
+        } else {
+            if (goals.length >= 5) return;
+            setGoals([...goals, goal]);
+        }
 
-        setGoals((prevGoals: string[]) => {
-            if (prevGoals.includes(goal)) {
-                const newGoals = prevGoals.filter(g => g !== goal);
-                setGoals(prevGoals.filter(g => g !== goal))
-                return newGoals;
-            } else {
-                if (prevGoals.length >= 5) return prevGoals;
-                const newGoals = [...prevGoals, goal];
-                setGoals(newGoals);
-                return newGoals;
-            }
-        });
+        // setGoals((prevGoals: string[]) => {
+        //     if (prevGoals.includes(goal)) {
+        //         const newGoals = prevGoals.filter(g => g !== goal);
+        //         setGoals(prevGoals.filter(g => g !== goal))
+        //         return newGoals;
+        //     } else {
+        //         if (prevGoals.length >= 5) return prevGoals;
+        //         const newGoals = [...prevGoals, goal];
+        //         setGoals(newGoals);
+        //         return newGoals;
+        //     }
+        // });
     };
 
     // useEffect(() => {

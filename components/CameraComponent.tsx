@@ -1,6 +1,6 @@
-import { CameraView, CameraType } from 'expo-camera';
-import { useRef, useState } from 'react';
-import { StyleSheet, Text, TouchableOpacity, View, Modal, Alert } from 'react-native';
+import { CameraView } from 'expo-camera';
+import { useRef, useState, useCallback, useEffect } from 'react';
+import { StyleSheet, Text, TouchableOpacity, View, Modal, Alert, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as MediaLibrary from 'expo-media-library';
 
@@ -19,91 +19,106 @@ export default function CameraComponent({
 }: CameraComponentProps) {
     const [capturedImage, setCapturedImage] = useState<string | null>(null);
     const cameraRef = useRef<CameraView>(null);
+    const [isCameraReady, setIsCameraReady] = useState(false);
+
+    // Reset camera state when modal closes
+    useEffect(() => {
+        if (!isVisible) {
+            setIsCameraReady(false);
+            setCapturedImage(null);
+        }
+    }, [isVisible]);
+
+    const onCameraReady = useCallback(() => {
+        setIsCameraReady(true);
+    }, []);
 
     const saveToGallery = async (uri: string) => {
         try {
-            // Request permissions
             const { status } = await MediaLibrary.requestPermissionsAsync();
             if (status !== 'granted') {
                 Alert.alert('Permission Required', 'Please allow access to save photos to your gallery.');
                 return null;
             }
 
-            // Generate filename using timestamp
-            const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-            const filename = `skincare_${timestamp}.jpg`;
-
-            // Save the image
             const asset = await MediaLibrary.createAssetAsync(uri);
-            
-            // Show success message
-            Alert.alert(
-                'Success',
-                'Photo saved to gallery successfully!',
-                [{ text: 'OK' }]
-            );
-
             return asset.uri;
         } catch (error) {
             console.error('Error saving photo:', error);
-            Alert.alert('Error', 'Failed to save photo to gallery');
             return null;
         }
     };
 
     const takePicture = async () => {
-        if (cameraRef.current) {
-            try {
-                const photo = await cameraRef.current.takePictureAsync();
-                if (photo) {
-                    setCapturedImage(photo.uri);
-                    
-                    // Save to gallery and get saved URI
-                    const savedUri = await saveToGallery(photo.uri);
-                    if (savedUri) {
+        if (!cameraRef.current || !isCameraReady) {
+            console.log('Camera not ready');
+            return;
+        }
+
+        try {
+            const photo = await cameraRef.current.takePictureAsync({
+                quality: 1,
+                skipProcessing: Platform.OS === 'android', // Skip processing on Android
+            });
+
+            if (photo) {
+                setCapturedImage(photo.uri);
+                const savedUri = await saveToGallery(photo.uri);
+                if (savedUri) {
+                    // Close camera first
+                    onClose();
+                    // Then notify parent after a short delay
+                    setTimeout(() => {
                         onImageCaptured(photo.uri, savedUri);
-                    }
+                    }, 100);
                 }
-            } catch (error) {
-                console.error('Error taking picture:', error);
-                Alert.alert('Error', 'Failed to take photo');
             }
+        } catch (error) {
+            console.error('Error taking picture:', error);
+            Alert.alert('Error', 'Failed to take photo');
         }
     };
 
-    const FaceGuideOverlay = () => (
-        <View style={styles.faceGuideContainer}>
-            <View style={styles.faceGuideCircle} />
-            <Text style={styles.guideText}>Position your face within the circle</Text>
-        </View>
-    );
-
     return (
         <Modal
-            animationType="slide"
-            presentationStyle="fullScreen"
+            animationType="none"
+            transparent={false}
             visible={isVisible}
             onRequestClose={onClose}
+            presentationStyle="fullScreen"
         >
-            <CameraView 
-                ref={cameraRef}
-                style={StyleSheet.absoluteFill} 
-                facing="front"
-            >
-                <TouchableOpacity 
-                    style={styles.closeButton}
-                    onPress={onClose}
+            <View style={StyleSheet.absoluteFill}>
+                <CameraView 
+                    ref={cameraRef}
+                    style={StyleSheet.absoluteFill} 
+                    facing="front"
+                    onCameraReady={onCameraReady}
+                    enableHighQualityPhotos={false}
                 >
-                    <Ionicons name="close" size={30} color="white" />
-                </TouchableOpacity>
-                
-                {showFaceGuide && <FaceGuideOverlay />}
-                
-                <TouchableOpacity 
-                    style={styles.captureButton}
-                    onPress={takePicture}
-                />
-            </CameraView>
+                    <TouchableOpacity 
+                        style={styles.closeButton}
+                        onPress={onClose}
+                    >
+                        <Ionicons name="close" size={30} color="white" />
+                    </TouchableOpacity>
+                    
+                    {showFaceGuide && (
+                        <View style={styles.faceGuideContainer}>
+                            <View style={styles.faceGuideCircle} />
+                            <Text style={styles.guideText}>Position your face within the circle</Text>
+                        </View>
+                    )}
+                    
+                    <TouchableOpacity 
+                        style={[
+                            styles.captureButton,
+                            !isCameraReady && styles.captureButtonDisabled
+                        ]}
+                        onPress={takePicture}
+                        disabled={!isCameraReady}
+                    />
+                </CameraView>
+            </View>
         </Modal>
     );
 }
@@ -125,6 +140,9 @@ const styles = StyleSheet.create({
         backgroundColor: 'white',
         borderWidth: 5,
         borderColor: 'rgba(255, 255, 255, 0.5)',
+    },
+    captureButtonDisabled: {
+        backgroundColor: 'rgba(255, 255, 255, 0.5)',
     },
     faceGuideContainer: {
         ...StyleSheet.absoluteFillObject,

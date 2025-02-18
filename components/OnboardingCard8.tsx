@@ -1,6 +1,6 @@
 import React from "react";
 import { defaultStyles } from "@/constants/Styles";
-import { ActivityIndicator, Alert, FlatList, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Alert, FlatList, StyleSheet, Text, View } from "react-native";
 import { useEffect, useState } from "react";
 import OpenAI from "openai";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -11,29 +11,28 @@ const OnboardingCard8 = ({width, step, setSkincareRoutine, skincareRoutine}: any
     const [ isLoading, setIsLoading ] = useState(true);
 
     useEffect(() => {
-        if (step) {
-          setIsLoading(false);
-          const test = async () => {
-            try {
-              const routine = await AsyncStorage.getItem("skincareRoutine");
-              console.log('routine', routine);
+        // if (step) {
+        //   const test = async () => {
+        //     try {
+        //       const routine = await AsyncStorage.getItem("skincareRoutine");
+        //       console.log('routine', routine);
               
-            } catch (error) {
-              console.error("Error fetching OpenAI API:", error);
-              setIsLoading(false); // Ensure loading state is updated even in case of an error
-            }
-          }
-          test();
-          const fetchRoutine = async () => {
-            const userData = {
-                age: await AsyncStorage.getItem("age"),
-                gender: await AsyncStorage.getItem("gender"),
-                goals: await AsyncStorage.getItem("goals"),
-            }
-            await openAICall(userData);
-          }
-          fetchRoutine();
-        }
+        //     } catch (error) {
+        //       console.error("Error fetching OpenAI API:", error);
+        //       setIsLoading(false); // Ensure loading state is updated even in case of an error
+        //     }
+        //   }
+        //   test();
+        //   const fetchRoutine = async () => {
+        //     const userData = {
+        //         age: await AsyncStorage.getItem("age"),
+        //         gender: await AsyncStorage.getItem("gender"),
+        //         goals: await AsyncStorage.getItem("goals"),
+        //     }
+        //     await openAICall(userData);
+        //   }
+        //   fetchRoutine();
+        // }
     }, [step])
 
     const RoutineEvent = z.object({
@@ -109,14 +108,15 @@ const OnboardingCard8 = ({width, step, setSkincareRoutine, skincareRoutine}: any
               }).then((e) => {
                 setIsLoading(false);
                 if (e.choices[0].message.content) {
-                  console.log(e.choices[0].message.content);
-                  setSkincareRoutine(e.choices[0].message.content);
+                  const routineData = JSON.parse(e.choices[0].message.content);
+                  console.log('Parsed routine:', routineData);
+                  setSkincareRoutine(routineData);
                 }
               })
         } catch (error) {
-            console.error("Error fetching OpenAI API:", error);
-            Alert.alert("Error fetching OpenAI API");
-            setIsLoading(false); // Ensure loading state is updated even in case of an error
+            console.error("Error:", error);
+            Alert.alert("Error generating skincare routine");
+            setIsLoading(false);
         }
     }
 
@@ -135,16 +135,31 @@ const OnboardingCard8 = ({width, step, setSkincareRoutine, skincareRoutine}: any
             <Text style={defaultStyles.onboardingTitle} >Finished!</Text>
             <Text style={defaultStyles.onboardingSubTitle} >Here is the currated list of Korean skincare products for you!</Text>
             
-            <FlatList
-            data={skincareRoutine}
-            renderItem={({item}) => (
-                <>
-                  <Text> {item.morning_routine} </Text>
-                </>
-            )}
-            style={{flex: 1}}
-            />
+            <View style={styles.routineContainer}>
+                <Text style={styles.routineTitle}>Morning Routine</Text>
+                <FlatList
+                    data={skincareRoutine?.morning_routine || []}
+                    renderItem={({item}) => (
+                        <View style={styles.routineItem}>
+                            <Text style={styles.stepText}>{item.step}</Text>
+                            <Text style={styles.productText}>{item.product}</Text>
+                        </View>
+                    )}
+                    keyExtractor={(item) => item.step}
+                />
 
+                <Text style={styles.routineTitle}>Evening Routine</Text>
+                <FlatList
+                    data={skincareRoutine?.evening_routine || []}
+                    renderItem={({item}) => (
+                        <View style={styles.routineItem}>
+                            <Text style={styles.stepText}>{item.step}</Text>
+                            <Text style={styles.productText}>{item.product}</Text>
+                        </View>
+                    )}
+                    keyExtractor={(item) => item.step}
+                />
+            </View>
         </View>
     )
 };
@@ -168,6 +183,27 @@ const styles = StyleSheet.create({
         color: "#FFFFFF",
         fontFamily: 'Roboto',
         fontSize: 13,
+    },
+    routineContainer: {
+        flex: 1,
+        padding: 20,
+    },
+    routineTitle: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        marginBottom: 10,
+    },
+    routineItem: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        padding: 5,
+    },
+    stepText: {
+        fontSize: 16,
+    },
+    productText: {
+        fontSize: 16,
     }
 })
 

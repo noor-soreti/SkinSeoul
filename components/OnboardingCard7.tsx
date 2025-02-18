@@ -1,16 +1,29 @@
 import { defaultStyles } from "@/constants/Styles"
-import { useState } from "react"
-import { StyleSheet, View, Text, TouchableOpacity, Alert, Dimensions } from "react-native"
+import { useState, useEffect } from "react"
+import { StyleSheet, View, Text, TouchableOpacity, Alert } from "react-native"
 import { Image } from "expo-image";
 import { Ionicons } from '@expo/vector-icons';
 import { useCameraPermissions } from 'expo-camera';
 import * as Device from 'expo-device';
 import CameraComponent from './CameraComponent';
 
-const OnboardingCard7 = ({width, setScan}: any) => {
+interface OnboardingCard7Props {
+    width: number;
+    setScan: (uri: string) => void;
+    isActive: boolean;
+    setDisableButton: (disableButton: boolean) => void;
+}
+
+const OnboardingCard7 = ({ width, setScan, isActive, setDisableButton }: OnboardingCard7Props) => {
     const [image, setImage] = useState<string | null>(null);
     const [showCamera, setShowCamera] = useState(false);
     const [permission, requestPermission] = useCameraPermissions();
+
+    useEffect(() => {
+        if (!isActive && showCamera) {
+            setShowCamera(false);
+        }
+    }, [isActive]);
 
     const isSimulator = Device.isDevice === false;
 
@@ -25,19 +38,34 @@ const OnboardingCard7 = ({width, setScan}: any) => {
 
         if (!permission?.granted) {
             const { granted } = await requestPermission();
-            if (!granted) return;
+            if (!granted) {
+                Alert.alert("Permission Required", "Camera access is needed to scan your face.");
+                return;
+            }
         }
         setShowCamera(true);
     };
 
     const handleImageCaptured = (imageUri: string, savedUri: string) => {
-        setImage(imageUri);
-        setScan(imageUri);
-        setShowCamera(false);
+        try {
+            setImage(imageUri);
+            setScan(imageUri);
+            setTimeout(() => {
+                setShowCamera(false);
+            }, 100);
+            setDisableButton(false);
+        } catch (error) {
+            console.error('Error handling captured image:', error);
+            Alert.alert('Error', 'Failed to process captured image');
+        }
     };
 
+    if (!isActive && showCamera) {
+        setShowCamera(false);
+    }
+
     return (
-        <View style={[defaultStyles.onboardingContainer, {width: width}]}>
+        <View style={[defaultStyles.onboardingContainer, {width}]}>
             <Text style={defaultStyles.onboardingTitle}>Let's scan your face</Text>
             <Text style={defaultStyles.onboardingCaption}>
                 We'll let our AI model analyze your skin to provide personalized recommendations
@@ -49,18 +77,28 @@ const OnboardingCard7 = ({width, setScan}: any) => {
                     onPress={startScan}
                 >
                     <Ionicons name="scan" size={50} color="black" />
-                    <Text style={styles.scanText}>Start Scan</Text>
+                    <Text style={styles.scanText}> {image ? "Retake" : "Start"} Scan</Text>
                 </TouchableOpacity>
             </View>
             
-            {image && <Image source={{ uri: image }} style={styles.previewImage} />}
+            {image && (
+                <View style={styles.previewContainer}>
+                    <Image 
+                        source={{ uri: image }} 
+                        style={styles.previewImage}
+                        contentFit="cover"
+                    />
+                </View>
+            )}
 
-            <CameraComponent 
-                isVisible={showCamera}
-                onClose={() => setShowCamera(false)}
-                onImageCaptured={handleImageCaptured}
-                showFaceGuide={true}
-            />
+            {isActive && (
+                <CameraComponent 
+                    isVisible={showCamera}
+                    onClose={() => setShowCamera(false)}
+                    onImageCaptured={handleImageCaptured}
+                    showFaceGuide={true}
+                />
+            )}
         </View>
     );
 };
@@ -68,8 +106,9 @@ const OnboardingCard7 = ({width, setScan}: any) => {
 const styles = StyleSheet.create({
     scanContainer: {
         flex: 1,
-        justifyContent: 'center',
+        // justifyContent: 'center',
         alignItems: 'center',
+        paddingTop: '30%',
     },
     scanButton: {
         alignItems: 'center',
@@ -83,11 +122,15 @@ const styles = StyleSheet.create({
         fontSize: 15,
         fontFamily: 'NunitoSans',
     },
+    previewContainer: {
+        alignItems: 'center',
+        position: 'absolute',
+        bottom: 20,
+    },
     previewImage: {
         width: 200,
         height: 200,
         borderRadius: 10,
-        marginTop: 20,
     },
 });
 

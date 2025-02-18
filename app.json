@@ -22,7 +22,10 @@
           }
         ]
       },
-      "googleServicesFile": "./GoogleService-Info.plist"
+      "googleServicesFile": "./GoogleService-Info.plist",
+      "config": {
+        "usesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -68,14 +71,29 @@
           "photosPermission": "The app accesses your photos to let you upload your pictures."
         }
       ],
-      ["@react-native-google-signin/google-signin"],
+      [
+        "@react-native-google-signin/google-signin"
+      ],
       [
         "expo-media-library",
         {
           "photosPermission": "Allow $(PRODUCT_NAME) to access your photos to save skin analysis images.",
           "savePhotosPermission": "Allow $(PRODUCT_NAME) to save photos to use for skin analysis."
         }
-      ]
+      ],
+      [
+        "expo-sqlite",
+        {
+          "enableFTS": true,
+          "useSQLCipher": true,
+          "ios": {
+            "customBuildFlags": [
+              "-DSQLITE_ENABLE_DBSTAT_VTAB=1 -DSQLITE_ENABLE_SNAPSHOT=1"
+            ]
+          }
+        }
+      ],
+      "expo-secure-store"
     ],
     "experiments": {
       "typedRoutes": true

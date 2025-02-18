@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import auth, { FirebaseAuthTypes } from '@react-native-firebase/auth';
 import * as SplashScreen from 'expo-splash-screen';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
+import { useCameraPermissions } from 'expo-camera';
 
 // Prevent the splash screen from auto-hiding
 // SplashScreen.preventAutoHideAsync();
@@ -18,6 +19,7 @@ const RootLayout = () => {
   const [ user, setUser ] = useState<FirebaseAuthTypes.User | null>();
   const router = useRouter();
   const segment = useSegments();
+  const [permission, requestPermission] = useCameraPermissions();
   useFonts({
     NobileRegular: require('../assets/fonts/Nobile-Regular.ttf'),
     NobileMedium: require('../assets/fonts/Nobile-Medium.ttf'),
@@ -59,12 +61,16 @@ const RootLayout = () => {
 
   }, [user])
 
+  useEffect(() => {
+    // Request camera permission on app start
+    requestPermission();
+  }, []);
 
   return (
     <Stack initialRouteName="index" screenOptions={{headerShown: false }} >
       <Stack.Screen name='index'/>
       <Stack.Screen name='(public)'/>
-      <Stack.Screen name="(tabs)" />
+      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
   </Stack>
   )
 }

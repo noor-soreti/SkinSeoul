@@ -37,7 +37,7 @@ export const getData = async (key: string) => {
 export const getObject = async (key: string) => {
     try {
       const jsonValue = await AsyncStorage.getItem(key);
-      console.log(jsonValue);
+      console.log('jsonValue:', jsonValue);
       
       return jsonValue != null ? JSON.parse(jsonValue) : null;
     } catch (e) {
