@@ -7,8 +7,8 @@ const LinearGradientSection = ({children}: any) => {
             <LinearGradient
                 colors={['#ED6672', '#ED6672', '#F1818B', '#F49DA4', '#F18790', '#ED6672']}
                 style={styles.background}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }} 
+                start={{ x: 0, y: 1 }}
+                end={{ x: 1, y: 0 }} 
             />
             {children}
         </View>

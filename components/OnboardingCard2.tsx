@@ -24,7 +24,9 @@ const OnboardingCard2 = ({width, isActive, setDisableButton, setAge, age}: any) 
 
     useEffect(() => {
         // console.log('selectedIndex:', selectedIndex);
-        if (selectedIndex >= 1) {
+        if (selectedIndex == 0) {
+            setDisableButton(true)
+        } else {
             setAge(dataSource[selectedIndex]);
             setDisableButton(false)
         }

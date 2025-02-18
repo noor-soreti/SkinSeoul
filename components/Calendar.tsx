@@ -214,6 +214,7 @@ const styles = StyleSheet.create({
         fontSize: 20,
         fontWeight: '400',
         marginBottom: 4,
+        color: '#BDBDBD',
     },
     dayName: {
         fontSize: 14,

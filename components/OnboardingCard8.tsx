@@ -6,33 +6,34 @@ import OpenAI from "openai";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { zodResponseFormat } from "openai/helpers/zod";
 import { set, z } from "zod";
+import RoutineView from "./RoutineView";
 
 const OnboardingCard8 = ({width, step, setSkincareRoutine, skincareRoutine}: any) => {
     const [ isLoading, setIsLoading ] = useState(true);
 
     useEffect(() => {
-        // if (step) {
-        //   const test = async () => {
-        //     try {
-        //       const routine = await AsyncStorage.getItem("skincareRoutine");
-        //       console.log('routine', routine);
+        if (step) {
+          const test = async () => {
+            try {
+              const routine = await AsyncStorage.getItem("skincareRoutine");
+              console.log('routine', routine);
               
-        //     } catch (error) {
-        //       console.error("Error fetching OpenAI API:", error);
-        //       setIsLoading(false); // Ensure loading state is updated even in case of an error
-        //     }
-        //   }
-        //   test();
-        //   const fetchRoutine = async () => {
-        //     const userData = {
-        //         age: await AsyncStorage.getItem("age"),
-        //         gender: await AsyncStorage.getItem("gender"),
-        //         goals: await AsyncStorage.getItem("goals"),
-        //     }
-        //     await openAICall(userData);
-        //   }
-        //   fetchRoutine();
-        // }
+            } catch (error) {
+              console.error("Error fetching OpenAI API:", error);
+              setIsLoading(false); // Ensure loading state is updated even in case of an error
+            }
+          }
+          test();
+          const fetchRoutine = async () => {
+            const userData = {
+                age: await AsyncStorage.getItem("age"),
+                gender: await AsyncStorage.getItem("gender"),
+                goals: await AsyncStorage.getItem("goals"),
+            }
+            await openAICall(userData);
+          }
+          fetchRoutine();
+        }
     }, [step])
 
     const RoutineEvent = z.object({
@@ -56,7 +57,7 @@ const OnboardingCard8 = ({width, step, setSkincareRoutine, skincareRoutine}: any
     const openAICall = async (userData: { age: any; gender: any; goals: any}) => {
         try {
             const openai = new OpenAI({
-                apiKey: "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"
+                apiKey: process.env.EXPO_PUBLIC_OPENAI_API_KEY
               });
               
               const response = await openai.chat.completions.create({
@@ -65,7 +66,38 @@ const OnboardingCard8 = ({width, step, setSkincareRoutine, skincareRoutine}: any
                 messages: [
                     {
                         role: "system",
-                        content: `You are a Korean skincare expert. Always respond in strict JSON format.
+                        content: `You are a Korean skincare expert.Analyze the user's skin from the provided image and identify any visible issues such as acne, hyperpigmentation, redness, and wrinkles.
+                                    Then, recommend a skincare routine using only Korean skincare products from these brands:
+                                    - Laneige
+                                    - Innisfree
+                                    - Etude House
+                                    - Missha
+                                    - Some By Mi
+                                    - Dr. Jart+
+                                    - Beauty of Joseon
+                                    - Pyunkang Yul
+                                    - Mediheal
+                                    - Isntree
+                                    - Klairs
+                                    - Neogen
+                                    - ROUND LAB
+                                    - Sulwhasoo
+                                    - The History of Whoo
+                                    - Banila Co
+                                    - Belif
+                                    - Skin1004
+                                    - Purito
+                                    - Torriden
+                                    - Anua
+                                    - TIRTIR
+                                    -  Goodal
+                                    - Dr. Ceuracle
+                                    - Amorepacific
+                                    - Holika Holika
+                                    - TonyMoly
+                                    - VT Cosmetics
+                                    - Illiyoon
+                                    
                                 **Output MUST be in JSON format** and follow this exact structure:  
                                   {
                                       "morning_routine": [
@@ -123,7 +155,7 @@ const OnboardingCard8 = ({width, step, setSkincareRoutine, skincareRoutine}: any
     if (isLoading) {
         return (
             <View style={[defaultStyles.onboardingContainer, {width: width}]}>
-                <Text style={defaultStyles.onboardingTitle} >Generating your ideal skincare routine—just a moment!</Text>
+                <Text style={defaultStyles.onboardingTitle} >Generating your ideal korean skincare routine—just a moment!</Text>
                 {/* Activity indicator */}
                 <ActivityIndicator style={{flex: 1}} size="large" color="#ED6672" />
             </View>
@@ -140,10 +172,7 @@ const OnboardingCard8 = ({width, step, setSkincareRoutine, skincareRoutine}: any
                 <FlatList
                     data={skincareRoutine?.morning_routine || []}
                     renderItem={({item}) => (
-                        <View style={styles.routineItem}>
-                            <Text style={styles.stepText}>{item.step}</Text>
-                            <Text style={styles.productText}>{item.product}</Text>
-                        </View>
+                        <RoutineView step={item.step} product={item.product} />
                     )}
                     keyExtractor={(item) => item.step}
                 />
@@ -152,10 +181,7 @@ const OnboardingCard8 = ({width, step, setSkincareRoutine, skincareRoutine}: any
                 <FlatList
                     data={skincareRoutine?.evening_routine || []}
                     renderItem={({item}) => (
-                        <View style={styles.routineItem}>
-                            <Text style={styles.stepText}>{item.step}</Text>
-                            <Text style={styles.productText}>{item.product}</Text>
-                        </View>
+                        <RoutineView step={item.step} product={item.product} />
                     )}
                     keyExtractor={(item) => item.step}
                 />
