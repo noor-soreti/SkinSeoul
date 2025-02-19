@@ -7,23 +7,40 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { zodResponseFormat } from "openai/helpers/zod";
 import { set, z } from "zod";
 import RoutineView from "./RoutineView";
+import { Image } from "expo-image";
 
 const OnboardingCard8 = ({width, step, setSkincareRoutine, skincareRoutine}: any) => {
     const [ isLoading, setIsLoading ] = useState(true);
 
+    const RoutineEvent = z.object({
+      morning_routine: z.array(
+        z.object({ step: z.literal("Cleanser"), product: z.string() })
+          .or(z.object({ step: z.literal("Toner"), product: z.string() }))
+          .or(z.object({ step: z.literal("Essence"), product: z.string() }))
+          .or(z.object({ step: z.literal("Moisturizer"), product: z.string() }))
+          .or(z.object({ step: z.literal("Sunscreen"), product: z.string() }))
+      ),
+      evening_routine: z.array(
+        z.object({ step: z.literal("Double Cleanse"), product: z.string() })
+          .or(z.object({ step: z.literal("Cleanser"), product: z.string() }))
+          .or(z.object({ step: z.literal("Toner"), product: z.string() }))
+          .or(z.object({ step: z.literal("Essence"), product: z.string() }))
+          .or(z.object({ step: z.literal("Moisturizer"), product: z.string() }))
+      )
+    });
+
     useEffect(() => {
         if (step) {
-          const test = async () => {
-            try {
-              const routine = await AsyncStorage.getItem("skincareRoutine");
-              console.log('routine', routine);
-              
-            } catch (error) {
-              console.error("Error fetching OpenAI API:", error);
-              setIsLoading(false); // Ensure loading state is updated even in case of an error
-            }
-          }
-          test();
+          // const test = async () => {
+          //   try {
+          //     const routine = await AsyncStorage.getItem("skincareRoutine");
+          //     console.log('routine', routine);
+          //   } catch (error) {
+          //     console.error("Error fetching OpenAI API:", error);
+          //     setIsLoading(false); // Ensure loading state is updated even in case of an error
+          //   }
+          // }
+          // test();
           const fetchRoutine = async () => {
             const userData = {
                 age: await AsyncStorage.getItem("age"),
@@ -34,25 +51,7 @@ const OnboardingCard8 = ({width, step, setSkincareRoutine, skincareRoutine}: any
           }
           fetchRoutine();
         }
-    }, [step])
-
-    const RoutineEvent = z.object({
-        morning_routine: z.array(
-          z.object({ step: z.literal("Cleanser"), product: z.string() })
-            .or(z.object({ step: z.literal("Toner"), product: z.string() }))
-            .or(z.object({ step: z.literal("Essence"), product: z.string() }))
-            .or(z.object({ step: z.literal("Moisturizer"), product: z.string() }))
-            .or(z.object({ step: z.literal("Sunscreen"), product: z.string() }))
-        ),
-        evening_routine: z.array(
-          z.object({ step: z.literal("Double Cleanse"), product: z.string() })
-            .or(z.object({ step: z.literal("Cleanser"), product: z.string() }))
-            .or(z.object({ step: z.literal("Toner"), product: z.string() }))
-            .or(z.object({ step: z.literal("Essence"), product: z.string() }))
-            .or(z.object({ step: z.literal("Moisturizer"), product: z.string() }))
-        )
-      });
-      
+    }, [step])      
 
     const openAICall = async (userData: { age: any; gender: any; goals: any}) => {
         try {
@@ -147,7 +146,7 @@ const OnboardingCard8 = ({width, step, setSkincareRoutine, skincareRoutine}: any
               })
         } catch (error) {
             console.error("Error:", error);
-            Alert.alert("Error generating skincare routine");
+            Alert.alert("Error generating skincare routine. Please try again.");
             setIsLoading(false);
         }
     }
@@ -165,14 +164,17 @@ const OnboardingCard8 = ({width, step, setSkincareRoutine, skincareRoutine}: any
     return (
         <View style={[defaultStyles.onboardingContainer, {width: width}]}>
             <Text style={defaultStyles.onboardingTitle} >Finished!</Text>
-            <Text style={defaultStyles.onboardingSubTitle} >Here is the currated list of Korean skincare products for you!</Text>
+            <Text style={defaultStyles.onboardingSubTitle} >oo is the currated list of Korean skincare products for you!</Text>
             
             <View style={styles.routineContainer}>
                 <Text style={styles.routineTitle}>Morning Routine</Text>
                 <FlatList
                     data={skincareRoutine?.morning_routine || []}
                     renderItem={({item}) => (
-                        <RoutineView step={item.step} product={item.product} />
+                        <View style={styles.routineItem}>
+                            <Image source={require('@/assets/images/routineIcons/bubbles.png')} style={{width: 50, height: 50}} />
+                            <Text style={styles.productText}>{item.product}</Text>
+                        </View>
                     )}
                     keyExtractor={(item) => item.step}
                 />
@@ -181,7 +183,10 @@ const OnboardingCard8 = ({width, step, setSkincareRoutine, skincareRoutine}: any
                 <FlatList
                     data={skincareRoutine?.evening_routine || []}
                     renderItem={({item}) => (
-                        <RoutineView step={item.step} product={item.product} />
+                      <View style={styles.routineItem}>
+                        <Text style={styles.stepText}>{item.step}</Text>
+                        <Text style={styles.productText}>{item.product}</Text>
+                      </View>
                     )}
                     keyExtractor={(item) => item.step}
                 />
@@ -223,13 +228,18 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        padding: 5,
+        padding: 15,
+        borderWidth: 1,
+        borderColor: '#D8DADC',
+        borderRadius: 10,
+        marginBottom: 10,
     },
     stepText: {
         fontSize: 16,
     },
     productText: {
         fontSize: 16,
+        flexWrap: 'wrap',
     }
 })
 
