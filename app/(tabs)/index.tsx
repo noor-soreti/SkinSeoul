@@ -1,6 +1,6 @@
 import Onboarding from "@/components/Onboarding"
 import { defaultStyles } from "@/constants/Styles"
-import { getData } from "@/storageHelper"
+import { getData, getObject } from "@/storageHelper"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import { useEffect, useState, useRef } from "react"
 import { Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native"
@@ -22,13 +22,15 @@ const HomeScreen = () => {
     
     useEffect(() => {
         async function checkFirstLaunch() {
-            // await AsyncStorage.clear()
+            await AsyncStorage.clear()
             // await AsyncStorage.setItem(IS_ONBOARDED, 'true')
             const firstLaunch = await AsyncStorage.getItem(IS_ONBOARDED);
             if (!firstLaunch) {
                 setShowOnboarding(true);
                 console.log("FIRST LAUNCH");
             }
+            const skincareRoutine = await getObject('skincareRoutine');
+            console.log('skincareRoutine', skincareRoutine);
         }
         checkFirstLaunch()
     }, [])

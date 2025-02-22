@@ -18,6 +18,11 @@ export const defaultStyles = StyleSheet.create({
         shadowRadius: 10,
         elevation: 5,  
     },
+    loginTitle: {
+        fontSize: 20, 
+        fontWeight: '800',
+        fontFamily: 'NobileRegular',
+    },
     onboardingContainer: {
         paddingTop: '5%',
         flex: 1,
@@ -114,5 +119,13 @@ export const defaultStyles = StyleSheet.create({
         paddingBottom: '5%',
         borderBottomEndRadius: 40,
         borderBottomStartRadius: 40,
+    },
+    chevronBack: {
+        alignSelf: 'flex-start',
+        marginLeft: 15,
+        borderWidth: 1,
+        borderColor: '#D8DADC',
+        borderRadius: 10,
+        padding: 5,
     }
 })

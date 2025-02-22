@@ -5,7 +5,7 @@ export default function Background({children}: any) {
   return (
     <SafeAreaView style={styles.container}>
       {/* <LinearGradient
-        colors={['#FFFFFF', '#FFC0C7', '#FF909A', '#FF7F89', '#ED6672', '#FF7F89', '#FF909A', '#FFC0C7', '#FFFFFF']}
+        colors={['#ED6672', '#FF7F89', '#FFC0C7', '#FFFFFF', '#FFC0C7', '#FF7F89', '#ED6672']}
         style={styles.background}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }} 

@@ -3,18 +3,34 @@ import LogInButton from "@/components/LogInButton";
 import { defaultStyles } from "@/constants/Styles";
 import { router } from "expo-router";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
+import auth from '@react-native-firebase/auth';
+
+const signInWithGoogle = async () => {
+  try {
+    await GoogleSignin.signIn();
+    const { accessToken, idToken } = await GoogleSignin.getTokens();
+    const googleCredential = auth.GoogleAuthProvider.credential(idToken);
+    return auth().signInWithCredential(googleCredential);
+  } catch (error: any) {
+    console.error('Google Sign-In Error:', error);
+  }
+};
 
 const buttonItems = [
-  {title: "Register with Apple", onPressFunction: () => { console.log("Apple") }},
-  {title: "Register with Google", onPressFunction: () => {console.log("Google")}},
-  {title: "Register with Email", onPressFunction: () => router.push("/(public)/emailRegister")},
+  {title: "Sign up with Apple", onPressFunction: () => { console.log("Apple") }},
+  {title: "Sign up with Google", onPressFunction: signInWithGoogle},
+  {title: "Sign up with Email", onPressFunction: () => router.push("/(public)/emailRegister")},
 ]
 
 const Register = () => {
   return (
     <Background>
       <View style={defaultStyles.container}>
-        <Text style={styles.title}>Your Korean Skin Care Journey Starts Here!</Text>
+        <View style={{alignItems: 'center', marginBottom: 40}}>
+          <Text style={defaultStyles.loginTitle}><Text style={{color: '#ED6672', fontFamily: 'NobileBold'}}>SkinSeoulAI</Text> welcomes you1</Text>
+          <Text style={{fontFamily: 'NobileRegular', fontSize: 12}}>Your korean skincare journey starts here!</Text>
+        </View>
         {
           buttonItems.map((item, index) => (
             <View style={defaultStyles.logInButton} key={index}>
@@ -22,9 +38,9 @@ const Register = () => {
             </View>
           ))
         }    
-        {/* <TouchableOpacity style={{top: 15}} onPress={() => router.push("/(public)/register")}>
+        <TouchableOpacity style={{top: 15}} onPress={() => router.back()}>
           <Text>Already have an account? <Text style={{color: '#4285F4'}} >Sign in here</Text> </Text>
-        </TouchableOpacity> */}
+        </TouchableOpacity>
       </View>
     </Background>
   );

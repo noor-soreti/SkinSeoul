@@ -1957,7 +1957,7 @@ PODS:
   - RecaptchaInterop (100.0.0)
   - RNAppleAuthentication (2.4.0):
     - React-Core
-  - RNCAsyncStorage (1.24.0):
+  - RNCAsyncStorage (1.23.1):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -2682,7 +2682,7 @@ SPEC CHECKSUMS:
   ReactCommon: 885ac625dd73cd6585ca5c1ad5c09e1ce848b015
   RecaptchaInterop: 7d1a4a01a6b2cb1610a47ef3f85f0c411434cb21
   RNAppleAuthentication: 8d313d93fe2238d6b7ff0a39c67ebcf298d96653
-  RNCAsyncStorage: 1cfcd2e83cc2741d069ffe5731b6eed61905da53
+  RNCAsyncStorage: d2806c4f4c8555fb3ca3fe5759e2f5e5ef74efe4
   RNCPicker: eb58284847837c4e8012aeaa0019f6f5dff6c7c4
   RNFBApp: c0e35c80b0da1c93767dcb0060491735518dbebb
   RNFBAuth: 43c7e51ed74e7c71caae2c296819d00a4cae78eb

@@ -27,7 +27,10 @@ const Index = () => {
   return (
     <Background>
       <View style={defaultStyles.container}>
-        <Text style={styles.title}>Your Korean Skin Care Journey Starts Here!</Text>
+        <View style={{alignItems: 'center', marginBottom: 40}}>
+        <Text style={defaultStyles.loginTitle}>Welcome back to <Text style={{color: '#ED6672', fontFamily: 'NobileBold'}}>SkinSeoulAI</Text></Text>
+        <Text style={{fontFamily: 'NobileRegular', fontSize: 12}}>We're so excited to see you again!</Text>
+        </View>
         {
           buttonItems.map((item, index) => (
             <View style={defaultStyles.logInButton} key={index}>
@@ -44,12 +47,6 @@ const Index = () => {
 }
 
 const styles = StyleSheet.create({
-  title: {
-    fontSize: 15, 
-    fontWeight: '800',
-    marginBottom: 40,
-    fontFamily: 'NobileRegular'
-  },
   textInput: {
     height: 50, 
     width: '90%', 

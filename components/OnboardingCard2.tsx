@@ -13,7 +13,7 @@ const dataSource = [ "-", "15", "16", "17", "18", "19", "20",
     "71", "72", "73", "74", "75", "76", "77", "78", "79", "80"]
    
 
-const OnboardingCard2 = ({width, isActive, setDisableButton, setAge, age}: any) => {
+const OnboardingCard2 = ({width, step, setDisableButton, setAge, age}: any) => {
     const [selectedIndex, setSelectedIndex] = useState( age ? dataSource.indexOf(age) : 0);    
 
     useEffect(() => {

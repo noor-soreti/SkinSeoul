@@ -8,145 +8,49 @@ import { zodResponseFormat } from "openai/helpers/zod";
 import { set, z } from "zod";
 import RoutineView from "./RoutineView";
 import { Image } from "expo-image";
+import { supabase } from '@/utils/supabase'
 
-const OnboardingCard8 = ({width, step, setSkincareRoutine, skincareRoutine}: any) => {
+const OnboardingCard8 = ({width, isActive, setSkincareRoutine, skincareRoutine}: any) => {
     const [ isLoading, setIsLoading ] = useState(true);
-
-    const RoutineEvent = z.object({
-      morning_routine: z.array(
-        z.object({ step: z.literal("Cleanser"), product: z.string() })
-          .or(z.object({ step: z.literal("Toner"), product: z.string() }))
-          .or(z.object({ step: z.literal("Essence"), product: z.string() }))
-          .or(z.object({ step: z.literal("Moisturizer"), product: z.string() }))
-          .or(z.object({ step: z.literal("Sunscreen"), product: z.string() }))
-      ),
-      evening_routine: z.array(
-        z.object({ step: z.literal("Double Cleanse"), product: z.string() })
-          .or(z.object({ step: z.literal("Cleanser"), product: z.string() }))
-          .or(z.object({ step: z.literal("Toner"), product: z.string() }))
-          .or(z.object({ step: z.literal("Essence"), product: z.string() }))
-          .or(z.object({ step: z.literal("Moisturizer"), product: z.string() }))
-      )
-    });
+    const [ aiResponse, setAiResponse ] = useState<string>('');
 
     useEffect(() => {
-        if (step) {
-          // const test = async () => {
-          //   try {
-          //     const routine = await AsyncStorage.getItem("skincareRoutine");
-          //     console.log('routine', routine);
-          //   } catch (error) {
-          //     console.error("Error fetching OpenAI API:", error);
-          //     setIsLoading(false); // Ensure loading state is updated even in case of an error
-          //   }
-          // }
-          // test();
+        if (isActive) {
           const fetchRoutine = async () => {
             const userData = {
                 age: await AsyncStorage.getItem("age"),
-                gender: await AsyncStorage.getItem("gender"),
                 goals: await AsyncStorage.getItem("goals"),
             }
             await openAICall(userData);
           }
           fetchRoutine();
         }
-    }, [step])      
+    }, [isActive])      
 
-    const openAICall = async (userData: { age: any; gender: any; goals: any}) => {
+    const openAICall = async (userData: { age: any; goals: any}) => {
         try {
-            const openai = new OpenAI({
-                apiKey: process.env.EXPO_PUBLIC_OPENAI_API_KEY
-              });
-              
-              const response = await openai.chat.completions.create({
-                model: "gpt-4o-mini",
-                response_format: zodResponseFormat(RoutineEvent, 'event'),
-                messages: [
-                    {
-                        role: "system",
-                        content: `You are a Korean skincare expert.Analyze the user's skin from the provided image and identify any visible issues such as acne, hyperpigmentation, redness, and wrinkles.
-                                    Then, recommend a skincare routine using only Korean skincare products from these brands:
-                                    - Laneige
-                                    - Innisfree
-                                    - Etude House
-                                    - Missha
-                                    - Some By Mi
-                                    - Dr. Jart+
-                                    - Beauty of Joseon
-                                    - Pyunkang Yul
-                                    - Mediheal
-                                    - Isntree
-                                    - Klairs
-                                    - Neogen
-                                    - ROUND LAB
-                                    - Sulwhasoo
-                                    - The History of Whoo
-                                    - Banila Co
-                                    - Belif
-                                    - Skin1004
-                                    - Purito
-                                    - Torriden
-                                    - Anua
-                                    - TIRTIR
-                                    -  Goodal
-                                    - Dr. Ceuracle
-                                    - Amorepacific
-                                    - Holika Holika
-                                    - TonyMoly
-                                    - VT Cosmetics
-                                    - Illiyoon
-                                    
-                                **Output MUST be in JSON format** and follow this exact structure:  
-                                  {
-                                      "morning_routine": [
-                                        { "step": "Cleanser", "product": "Product Name" },
-                                        { "step": "Toner", "product": "Product Name" },
-                                        { "step": "Essence", "product": "Product Name" },
-                                        { "step": "Moisturizer", "product": "Product Name" },
-                                        { "step": "Sunscreen", "product": "Product Name" }
-                                      ],
-                                      "evening_routine": [
-                                        { "step": "Double Cleanse", "product": "Product Name" },
-                                        { "step": "Cleanser", "product": "Product Name" },
-                                        { "step": "Toner", "product": "Product Name" },
-                                        { "step": "Essence", "product": "Product Name" },
-                                        { "step": "Moisturizer", "product": "Product Name" }
-                                      ]
-                                  }`
-                    },
-                  {
-                    role: "user",
-                    content: [
-                      { 
-                        type: "text", 
-                        text: `Build a Korean skincare routine with only Korean skincare products based on the following user details:
-                        - Age: ${userData.age}
-                        - Gender: ${userData.gender}
-                        - Skincare Goals: ${userData.goals}
-                        `
-                 },
-                      // {
-                      //   type: "image_url",
-                      //   image_url: {
-                      //     "url": "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fi.redd.it%2Fx1f4q8vxfty91.jpg&f=1&nofb=1&ipt=945430cbe0baf1b40571fe5799c0be03f2dfb3764b5d196f731cca376ce738f7&ipo=images",
-                      //   },
-                      // },
-                    ],
-                  },
-                ],
-                store: true,
-              }).then((e) => {
-                setIsLoading(false);
-                if (e.choices[0].message.content) {
-                  const routineData = JSON.parse(e.choices[0].message.content);
-                  console.log('Parsed routine:', routineData);
-                  setSkincareRoutine(routineData);
+            // Call the Supabase Edge Function
+            const response = await supabase.functions.invoke('openai', {
+                body: { userData },
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
                 }
-              })
+            })
+            
+            console.log('Full response:', response);  // Log the full response
+            console.log('Data:', response.data);      // Log just the data
+            
+            if (!response.data) {
+                throw new Error('No data received from edge function');
+            }
+            
+            // setSkincareRoutine(data);
+            setAiResponse(response.data.message);
+            setIsLoading(false);
         } catch (error) {
             console.error("Error:", error);
-            Alert.alert("Error generating skincare routine. Please try again.");
+            Alert.alert("Error calling AI service. Please try again.");
             setIsLoading(false);
         }
     }
@@ -164,7 +68,9 @@ const OnboardingCard8 = ({width, step, setSkincareRoutine, skincareRoutine}: any
     return (
         <View style={[defaultStyles.onboardingContainer, {width: width}]}>
             <Text style={defaultStyles.onboardingTitle} >Finished!</Text>
-            <Text style={defaultStyles.onboardingSubTitle} >oo is the currated list of Korean skincare products for you!</Text>
+            <Text style={defaultStyles.onboardingCaption}>
+                We'll let our AI model analyze your skin to provide personalized recommendations
+            </Text>
             
             <View style={styles.routineContainer}>
                 <Text style={styles.routineTitle}>Morning Routine</Text>

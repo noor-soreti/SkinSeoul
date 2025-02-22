@@ -6,6 +6,9 @@ import { Ionicons } from '@expo/vector-icons';
 import { useCameraPermissions } from 'expo-camera';
 import * as Device from 'expo-device';
 import CameraComponent from './CameraComponent';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+const SCAN_HISTORY_KEY = 'SCAN_HISTORY';
 
 interface OnboardingCard7Props {
     width: number;
@@ -46,7 +49,7 @@ const OnboardingCard7 = ({ width, setScan, isActive, setDisableButton }: Onboard
         setShowCamera(true);
     };
 
-    const handleImageCaptured = (imageUri: string, savedUri: string) => {
+    const handleImageCaptured =  async(imageUri: string, savedUri: string) => {
         try {
             setImage(imageUri);
             setScan(imageUri);
@@ -54,6 +57,10 @@ const OnboardingCard7 = ({ width, setScan, isActive, setDisableButton }: Onboard
                 setShowCamera(false);
             }, 100);
             setDisableButton(false);
+            const scanHistory = await AsyncStorage.getItem(SCAN_HISTORY_KEY);
+            const history = scanHistory ? JSON.parse(scanHistory) : [];
+            history.push(new Date().toISOString());
+            await AsyncStorage.setItem(SCAN_HISTORY_KEY, JSON.stringify(history));
         } catch (error) {
             console.error('Error handling captured image:', error);
             Alert.alert('Error', 'Failed to process captured image');
@@ -72,16 +79,8 @@ const OnboardingCard7 = ({ width, setScan, isActive, setDisableButton }: Onboard
             </Text>
             
             <View style={styles.scanContainer}>
-                <TouchableOpacity 
-                    style={styles.scanButton} 
-                    onPress={startScan}
-                >
-                    <Ionicons name="scan" size={50} color="black" />
-                    <Text style={styles.scanText}> {image ? "Retake" : "Start"} Scan</Text>
-                </TouchableOpacity>
-            </View>
-            
-            {image && (
+
+            {image ? 
                 <View style={styles.previewContainer}>
                     <Image 
                         source={{ uri: image }} 
@@ -89,7 +88,21 @@ const OnboardingCard7 = ({ width, setScan, isActive, setDisableButton }: Onboard
                         contentFit="cover"
                     />
                 </View>
-            )}
+            :
+                <TouchableOpacity 
+                style={styles.scanButton} 
+                onPress={startScan}
+                >
+                    <Ionicons name="scan" size={50} color="black" />
+                    <Text style={styles.scanText}> Start Scan</Text>
+                </TouchableOpacity>
+
+        }
+
+
+            </View>
+            
+
 
             {isActive && (
                 <CameraComponent 
@@ -123,9 +136,9 @@ const styles = StyleSheet.create({
         fontFamily: 'NunitoSans',
     },
     previewContainer: {
-        alignItems: 'center',
-        position: 'absolute',
-        bottom: 20,
+        // alignItems: 'center',
+        // position: 'absolute',
+        // bottom: 20,
     },
     previewImage: {
         width: 200,
