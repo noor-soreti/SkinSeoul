@@ -1,7 +1,7 @@
 import { defaultStyles } from "@/constants/Styles";
 import React, { useEffect, useRef, useState } from "react";
 import { FlatList, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { getData } from "@/storageHelper";
+import { getData } from "@/utils/storageHelper";
 
 const GOALS = [
     { title: "Achieve glowing, radiant skin ✨" },

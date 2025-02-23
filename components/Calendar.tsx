@@ -90,88 +90,42 @@ const Calendar: React.FC<CalendarProps> = ({ onDateSelect }) => {
                     contentContainerStyle={styles.scrollContent}
                 >
                     {daysInMonth.map((date) => (
-                        <>
-                            {
-                            date.toDateString() === selectedDate.toDateString() 
-                            ?
-                            <TouchableOpacity
-                            key={date.toISOString()}
-                            style={[
-                                styles.dateItem,
-                                styles.selectedDate
-                            ]}
-                            onPress={() => handleDateSelect(date)}
-                            >
-                                <LinearGradient
-                                    colors={['#FF909A', '#FFCAD0', '#FFE6EB', '#FFEEF2', '#FFCAD0', '#FF909A']} 
-                                    locations={[0.05, 0.19, 0.39, 0.56, 0.73, 1]} // Adjust the color transition points
-                                    start={{ x: 1, y: 0 }}
-                                    end={{ x: 0, y: 1 }} 
-                                    style={[
-                                        styles.dateItem,
-                                        styles.selectedDate
-                                    ]}
+                        <React.Fragment key={date.toISOString()}>
+                            {date.toDateString() === selectedDate.toDateString() 
+                            ? (
+                                <TouchableOpacity
+                                    style={[styles.dateItem, styles.selectedDate]}
+                                    onPress={() => handleDateSelect(date)}
                                 >
-                                    <Text style={[
-                                    styles.dateNumber,
-                                    styles.selectedDateText
-                                    ]}>
+                                    <LinearGradient
+                                        colors={['#FF909A', '#FFCAD0', '#FFE6EB', '#FFEEF2', '#FFCAD0', '#FF909A']} 
+                                        locations={[0.05, 0.19, 0.39, 0.56, 0.73, 1]}
+                                        start={{ x: 1, y: 0 }}
+                                        end={{ x: 0, y: 1 }} 
+                                        style={[styles.dateItem, styles.selectedDate]}
+                                    >
+                                        <Text style={[styles.dateNumber, styles.selectedDateText]}>
+                                            {date.getDate()}
+                                        </Text>
+                                        <Text style={[styles.dayName, styles.selectedDateText]}>
+                                            {formatDay(date)}
+                                        </Text>
+                                    </LinearGradient>
+                                </TouchableOpacity>
+                            ) : (
+                                <TouchableOpacity
+                                    style={[styles.dateItem]}
+                                    onPress={() => handleDateSelect(date)}
+                                >
+                                    <Text style={[styles.dateNumber]}>
                                         {date.getDate()}
                                     </Text>
-                                    <Text style={[
-                                        styles.dayName,
-                                        styles.selectedDateText
-                                    ]}>
+                                    <Text style={[styles.dayName]}>
                                         {formatDay(date)}
                                     </Text>
-                                </LinearGradient>
-                            </TouchableOpacity>
-                            :
-                            <TouchableOpacity
-                            key={date.toISOString()}
-                            style={[
-                                styles.dateItem,
-                            ]}
-                            onPress={() => handleDateSelect(date)}
-                            >
-                                <Text style={[
-                                    styles.dateNumber,
-                                ]}>
-                                    {date.getDate()}
-                                </Text>
-                                <Text style={[
-                                    styles.dayName,
-                                ]}>
-                                    {formatDay(date)}
-                                </Text>
-                            </TouchableOpacity>
-                        }
-                        </>
-
-
-                        // <TouchableOpacity
-                        //     key={date.toISOString()}
-                        //     style={[
-                        //         styles.dateItem,
-                        //         date.toDateString() === selectedDate.toDateString() && styles.selectedDate
-                        //     ]}
-                        //     onPress={() => handleDateSelect(date)}
-                        // >
-                        //     <Text style={[
-                        //         styles.dateNumber,
-                        //         date.toDateString() === selectedDate.toDateString() && styles.selectedDateText
-                        //     ]}>
-                        //         {date.getDate()}
-                        //     </Text>
-                        //     <Text style={[
-                        //         styles.dayName,
-                        //         date.toDateString() === selectedDate.toDateString() && styles.selectedDateText
-                        //     ]}>
-                        //         {formatDay(date)}
-                        //     </Text>
-                        // </TouchableOpacity>
-
-
+                                </TouchableOpacity>
+                            )}
+                        </React.Fragment>
                     ))}
                 </ScrollView>
             </View>

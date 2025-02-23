@@ -1,4 +1,5 @@
 import { HapticTab } from "@/components/HapticTab"
+import { Image } from "expo-image"
 import { Stack, Tabs } from "expo-router"
 import { Platform } from "react-native"
 
@@ -20,7 +21,29 @@ const TabLayout = () => {
                 name="index"
                 options={{
                 title: 'Home',
-                // tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
+                tabBarIcon: ({ focused }) => 
+                (
+                  focused ?
+                  <Image source={require('@/assets/images/tabIcons/home-active.png')} style={{ width: 24, height: 24  }} />
+                  :
+                  <Image source={require('@/assets/images/tabIcons/home.png')} style={{ width: 24, height: 24  }} />
+
+                )
+                }}
+            />
+
+            <Tabs.Screen
+                name="profile"
+                options={{
+                title: 'Profile',
+                tabBarIcon: ({ focused }) => 
+                  (
+                    focused ?
+                    <Image source={require('@/assets/images/tabIcons/profile-active.png')} style={{ width: 24, height: 24  }} />
+                    :
+                    <Image source={require('@/assets/images/tabIcons/profile.png')} style={{ width: 24, height: 24  }} />
+  
+                  )
                 }}
             />
 

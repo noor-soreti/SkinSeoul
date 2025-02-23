@@ -78,7 +78,7 @@ const OnboardingCard8 = ({width, isActive, setSkincareRoutine, skincareRoutine}:
                     data={skincareRoutine?.morning_routine || []}
                     renderItem={({item}) => (
                         <View style={styles.routineItem}>
-                            <Image source={require('@/assets/images/routineIcons/bubbles.png')} style={{width: 50, height: 50}} />
+                            <Image source={require('@/assets/images/routineIcons/cleanser.png')} style={{width: 50, height: 50}} />
                             <Text style={styles.productText}>{item.product}</Text>
                         </View>
                     )}

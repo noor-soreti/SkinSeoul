@@ -1,14 +1,20 @@
 import Onboarding from "@/components/Onboarding"
 import { defaultStyles } from "@/constants/Styles"
-import { getData, getObject } from "@/storageHelper"
+import { getData, getObject } from "@/utils/storageHelper"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import { useEffect, useState, useRef } from "react"
-import { Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native"
+import { Modal, StyleSheet, Text, TouchableOpacity, View, ActivityIndicator, ScrollView } from "react-native"
 import Calendar from '@/components/Calendar'
 import ScanButton from '@/components/ScanButton'
 import { Camera, CameraType, CameraView, useCameraPermissions } from 'expo-camera'
 import LinearGradientSection from "@/components/LinearGradientSection"
 import CameraComponent from '@/components/CameraComponent'
+import { initDatabase, getStepsWithCompletions, updateStepStatus, getRoutineSteps, insertDummyData } from '@/utils/database'
+import { RoutineStep, CompletionStatus, LoadingState } from '@/utils/types/database'
+import RoutineStepItem from "@/components/RoutineStepItem"
+import ErrorToast from '@/components/ErrorToast'
+import RoutineToggle from '@/components/RoutineToggle'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 const IS_ONBOARDED = "IS_ONBOARDED"
 
@@ -19,10 +25,47 @@ const HomeScreen = () => {
     const [permission, requestPermission] = useCameraPermissions()
     const textRef = useRef<Text>(null)
     const [capturedImage, setCapturedImage] = useState<string | null>(null)
+    const [routineSteps, setRoutineSteps] = useState<(RoutineStep & { status: CompletionStatus | null })[]>([])
+    const [loadingState, setLoadingState] = useState<LoadingState>({
+        isLoading: true,
+        error: null,
+        lastUpdated: null
+    });
+    const [errorToast, setErrorToast] = useState({
+        visible: false,
+        message: ''
+    });
+    const [selectedRoutine, setSelectedRoutine] = useState<'morning' | 'evening'>('morning');
+    const insets = useSafeAreaInsets();
+    const TAB_HEIGHT = 80; 
     
+    // initialize the database and insert dummy data if needed
+    useEffect(() => {
+        const setup = async () => {
+            try {
+                await initDatabase();
+                // check if we already have steps
+                const existingSteps = await getRoutineSteps('morning');
+                if (existingSteps.length === 0) {
+                    await insertDummyData();
+                }
+                await loadRoutineSteps();
+            } catch (error) {
+                console.error('Failed to initialize:', error);
+                setLoadingState({
+                    isLoading: false,
+                    error: 'Failed to setup database. Please restart the app.',
+                    lastUpdated: null
+                });
+            }
+        };
+        setup();
+    }, []);
+
+    // check if the user has completed the onboarding
     useEffect(() => {
         async function checkFirstLaunch() {
-            await AsyncStorage.clear()
+            // await AsyncStorage.clear()
             // await AsyncStorage.setItem(IS_ONBOARDED, 'true')
             const firstLaunch = await AsyncStorage.getItem(IS_ONBOARDED);
             if (!firstLaunch) {
@@ -35,23 +78,69 @@ const HomeScreen = () => {
         checkFirstLaunch()
     }, [])
 
-    useEffect(() => {
-        async function getSkincareItems() {
-            const skincareItem = await getData('skincareRoutine')
-            console.log(skincareItem);
-            
-        }
-        getSkincareItems();
-    }, [])
-
+    // handle the onboarding close
     async function onFirstLaunchClosed() {
         await AsyncStorage.setItem(IS_ONBOARDED, 'true')
         setShowOnboarding(false)
     }
 
+    // handle the date select
     const handleDateSelect = (date: Date) => {
         setSelectedDate(date);
-        // Here you can add logic to fetch products for the selected date
+        loadRoutineSteps();  // Reload steps when date changes
+    };    
+    
+    // handle the step press
+    const handleStepPress = async (stepId: number) => {
+        try {
+            const step = routineSteps.find(s => s.id === stepId);
+            // Simple toggle between null and completed
+            const newStatus = step?.status === 'completed' ? null : 'completed';
+            
+            // Update database if status changed
+            if (step?.status !== newStatus) {
+                if (newStatus) {
+                    await updateStepStatus(stepId, selectedDate.toISOString().split('T')[0], newStatus);
+                }
+                // Update local state immediately
+                setRoutineSteps(currentSteps => 
+                    currentSteps.map(step => 
+                        step.id === stepId 
+                            ? { ...step, status: newStatus }
+                            : step
+                    )
+                );
+            }
+        } catch (error) {
+            console.error('Failed to update step status:', error);
+            showError('Failed to update step. Please try again.');
+        }
+    };
+
+    // Add this new handler function
+    const handleSkipStep = async (stepId: number) => {
+        try {
+            const step = routineSteps.find(s => s.id === stepId);
+            // Toggle between skipped and null
+            const newStatus = step?.status === 'skipped' ? null : 'skipped';
+            
+            if (step?.status !== newStatus) {
+                if (newStatus) {
+                    await updateStepStatus(stepId, selectedDate.toISOString().split('T')[0], newStatus);
+                }
+                // Update local state immediately
+                setRoutineSteps(currentSteps => 
+                    currentSteps.map(step => 
+                        step.id === stepId 
+                            ? { ...step, status: newStatus }
+                            : step
+                    )
+                );
+            }
+        } catch (error) {
+            console.error('Failed to update step status:', error);
+            showError('Failed to skip step. Please try again.');
+        }
     };
 
     const handleScan = async () => {
@@ -69,6 +158,57 @@ const HomeScreen = () => {
         setShowCamera(false);
     };
 
+    const loadRoutineSteps = async () => {
+        setLoadingState(prev => ({ ...prev, isLoading: true, error: null }));
+        try {
+            const steps = await getStepsWithCompletions(
+                selectedDate.toISOString(), 
+                selectedRoutine
+            );
+            setRoutineSteps(steps);
+            setLoadingState({
+                isLoading: false,
+                error: null,
+                lastUpdated: new Date()
+            });
+        } catch (error) {
+            console.error('Failed to load routine steps:', error);
+            setLoadingState({
+                isLoading: false,
+                error: 'Failed to load your routine. Please try again.',
+                lastUpdated: null
+            });
+        }
+    }
+
+    // Loading and Error components
+    const LoadingView = () => (
+        <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color="#ED6672" />
+            <Text style={styles.loadingText}>Loading your routine...</Text>
+        </View>
+    );
+
+    const ErrorView = () => (
+        <View style={styles.errorContainer}>
+            <Text style={styles.errorText}>{loadingState.error}</Text>
+            <TouchableOpacity 
+                onPress={loadRoutineSteps} 
+                style={styles.retryButton}
+            >
+                <Text style={styles.retryText}>Try Again</Text>
+            </TouchableOpacity>
+        </View>
+    );
+
+    const showError = (message: string) => {
+        setErrorToast({ visible: true, message });
+        // Hide after 3 seconds
+        setTimeout(() => {
+            setErrorToast({ visible: false, message: '' });
+        }, 3000);
+    };
+
     return (
         <View style={defaultStyles.screenContainer}>
             <LinearGradientSection>
@@ -84,15 +224,39 @@ const HomeScreen = () => {
                 <Calendar onDateSelect={handleDateSelect} />
             </View>
 
-            <View style={{padding: '5%'}}>
-                <TouchableOpacity style={styles.productItem}>
-                    {/* <View style={styles.productItem}> */}
-                        <Text>Product Name</Text>
-                        <Text style={styles.step} >Step 1</Text>
-                        
-                    {/* </View> */}
-                </TouchableOpacity>
-            </View>
+            <ScrollView 
+                style={styles.routineList}
+                contentContainerStyle={[
+                    styles.routineListContent,
+                    { paddingBottom: insets.bottom + TAB_HEIGHT }
+                ]}
+                showsVerticalScrollIndicator={false}
+            >
+                <RoutineToggle 
+                    selectedRoutine={selectedRoutine}
+                    onToggle={(routine) => {
+                        setSelectedRoutine(routine);
+                        loadRoutineSteps();
+                    }}
+                />
+
+                {loadingState.isLoading ? (
+                    <LoadingView />
+                ) : loadingState.error ? (
+                    <ErrorView />
+                ) : routineSteps.length > 0 ? (
+                    routineSteps.map(step => (
+                        <RoutineStepItem
+                            key={step.id}
+                            step={step}
+                            onPress={() => handleStepPress(step.id)}
+                            onSkip={() => handleSkipStep(step.id)}
+                        />
+                    ))
+                ) : (
+                    <Text style={styles.noSteps}>No routine steps found</Text>
+                )}
+            </ScrollView>
 
             <Modal
                 animationType="slide"
@@ -107,6 +271,11 @@ const HomeScreen = () => {
                 isVisible={showCamera}
                 onClose={() => setShowCamera(false)}
                 onImageCaptured={handleImageCaptured}
+            />
+
+            <ErrorToast 
+                visible={errorToast.visible}
+                message={errorToast.message}
             />
         </View>
     )
@@ -124,8 +293,8 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         shadowColor: '#e0e0e0',
         shadowOffset: { width: 0, height: 10 },
-        shadowOpacity: 0.5,
-        shadowRadius: 10,
+        shadowOpacity: 0.1,
+        shadowRadius: 5,
         elevation: 5,
         
     },
@@ -176,5 +345,49 @@ const styles = StyleSheet.create({
         backgroundColor: 'white',
         borderWidth: 5,
         borderColor: 'rgba(255, 255, 255, 0.5)',
+    },
+    routineList: {
+        flex: 1,
+    },
+    routineListContent: {
+        paddingHorizontal: 20,
+        paddingTop: 10,
+    },
+    noSteps: {
+        textAlign: 'center',
+        color: '#666',
+        marginTop: 20,
+    },
+    loadingContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    loadingText: {
+        marginTop: 10,
+        color: '#666',
+        fontSize: 16,
+    },
+    errorContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: 20,
+    },
+    errorText: {
+        color: '#ED6672',
+        fontSize: 16,
+        textAlign: 'center',
+        marginBottom: 20,
+    },
+    retryButton: {
+        backgroundColor: '#ED6672',
+        paddingHorizontal: 20,
+        paddingVertical: 10,
+        borderRadius: 8,
+    },
+    retryText: {
+        color: 'white',
+        fontSize: 16,
     },
 })

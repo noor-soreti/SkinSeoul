@@ -9,7 +9,7 @@ import { router } from "expo-router";
 import OnboardingCard7 from "./OnboardingCard7";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import OnboardingCard8 from "./OnboardingCard8";
-import { getData, getObject, storeData, storeObject } from "@/storageHelper";
+import { getData, getObject, storeData, storeObject } from "@/utils/storageHelper";
 
 type Props = {
     onClose: () => void
