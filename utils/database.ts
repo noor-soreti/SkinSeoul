@@ -6,6 +6,7 @@ import {
   StepCompletion,
   ProductType 
 } from './types/database';
+import { AIRoutineResponse } from './aiService';  // Import the type
 
 let db: SQLite.SQLiteDatabase;
 
@@ -253,5 +254,59 @@ export async function insertDummyData() {
 
   for (const step of [...morningSteps, ...eveningSteps]) {
     await insertRoutineStep(step);
+  }
+}
+
+export async function storeRoutine(routine: AIRoutineResponse): Promise<void> {
+  try {
+    console.log('Starting to store routine in database...');
+    
+    // First, clear existing routine steps
+    await db.runAsync('DELETE FROM routine_steps');
+    console.log('Cleared existing routine steps');
+    
+    // Store morning routine
+    for (let i = 0; i < routine.morning_routine.length; i++) {
+      const step = routine.morning_routine[i];
+      await insertRoutineStep({
+        product_name: step.product,
+        product_type: step.step as ProductType,
+        step_number: i + 1,
+        image_path: `${step.step.toLowerCase()}.png`,
+        routine_type: 'morning'
+      });
+    }
+    console.log('Stored morning routine');
+
+    // Store evening routine
+    for (let i = 0; i < routine.evening_routine.length; i++) {
+      const step = routine.evening_routine[i];
+      await insertRoutineStep({
+        product_name: step.product,
+        product_type: step.step as ProductType,
+        step_number: i + 1,
+        image_path: `${step.step.toLowerCase()}.png`,
+        routine_type: 'evening'
+      });
+    }
+    console.log('Stored evening routine');
+
+    // Verify storage by retrieving the stored routines
+    const morningSteps = await getRoutineSteps('morning');
+    const eveningSteps = await getRoutineSteps('evening');
+    console.log('Verified stored routines:', { 
+      morning: morningSteps.length, 
+      evening: eveningSteps.length 
+    });
+
+  } catch (error) {
+    const dbError: DatabaseErrorType = {
+      message: 'Failed to store routine in database',
+      originalError: error instanceof Error ? error.message : String(error),
+      operation: 'create',
+      table: 'routine_steps'
+    };
+    console.error(dbError);
+    throw dbError;
   }
 }

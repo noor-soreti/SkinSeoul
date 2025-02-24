@@ -1,6 +1,6 @@
 import React from "react";
 import { defaultStyles } from "@/constants/Styles";
-import { ActivityIndicator, Alert, FlatList, StyleSheet, Text, View, TouchableOpacity } from "react-native";
+import { ActivityIndicator, Alert, FlatList, StyleSheet, Text, View, TouchableOpacity, ScrollView } from "react-native";
 import { useEffect, useState } from "react";
 import OpenAI from "openai";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -11,6 +11,7 @@ import { Image } from "expo-image";
 import { supabase } from '@/utils/supabase'
 import { getData } from '@/utils/storageHelper';
 import { generateSkincareRoutine } from '@/utils/aiService';
+import { storeRoutine, getRoutineSteps } from '@/utils/database';
 
 const OnboardingCard8 = ({width, isActive, setDisableButton, setSkincareRoutine, skincareRoutine}: any) => {
     const [ isLoading, setIsLoading ] = useState(true);
@@ -67,10 +68,26 @@ const OnboardingCard8 = ({width, isActive, setDisableButton, setSkincareRoutine,
     const handlePress = async () => {
         setLoading(true);
         try {
-            const response = await generateSkincareRoutine();
-            setSkincareRoutine(response);
-            console.log('Response:', response);
-            Alert.alert('Success', response);
+            const routineData = await generateSkincareRoutine();
+            await storeRoutine(routineData);
+
+            // Get the stored routine from database
+            const morningSteps = await getRoutineSteps('morning');
+            const eveningSteps = await getRoutineSteps('evening');
+            
+            // Update the UI with database data
+            setSkincareRoutine({
+                morning_routine: morningSteps.map(step => ({
+                    step: step.product_type,
+                    product: step.product_name
+                })),
+                evening_routine: eveningSteps.map(step => ({
+                    step: step.product_type,
+                    product: step.product_name
+                }))
+            });
+
+            Alert.alert('Success', 'Your skincare routine has been generated and saved!');
         } catch (error: any) {
             console.error('Error:', error);
             Alert.alert('Error', error.message || 'Something went wrong');
@@ -91,40 +108,44 @@ const OnboardingCard8 = ({width, isActive, setDisableButton, setSkincareRoutine,
 
     return (
         <View style={[defaultStyles.onboardingContainer, {width: width}]}>
-            <Text style={defaultStyles.onboardingTitle} >Finished!</Text>
+            <Text style={defaultStyles.onboardingTitle}>Finished!</Text>
             <Text style={defaultStyles.onboardingCaption}>
-                We'll let our AI model analyze your skin to provide personalized recommendations
+                View your AI generated skincare routine below
             </Text>
 
             <TouchableOpacity onPress={handlePress}>
                 <Text>Generate Routine</Text>
             </TouchableOpacity>
             
-            <View style={styles.routineContainer}>
-                <Text style={styles.routineTitle}>Morning Routine</Text>
-                <FlatList
-                    data={skincareRoutine?.morning_routine || []}
-                    renderItem={({item}) => (
-                        <View style={styles.routineItem}>
-                            <Image source={require('@/assets/images/routineIcons/cleanser.png')} style={{width: 50, height: 50}} />
-                            <Text style={styles.productText}>{item.product}</Text>
-                        </View>
-                    )}
-                    keyExtractor={(item) => item.step}
-                />
+            <ScrollView style={styles.routineScrollContainer} contentContainerStyle={styles.routineContentContainer}>
+                <View style={styles.routineContainer}>
+                    <Text style={styles.routineTitle}>Morning Routine ☀️</Text>
+                    <FlatList
+                        scrollEnabled={false}
+                        data={skincareRoutine?.morning_routine || []}
+                        renderItem={({item}) => (
+                            <View style={styles.routineItem}>
+                                <Text style={styles.stepText}>{item.step}</Text>
+                                <Text style={styles.productText}>{item.product}</Text>
+                            </View>
+                        )}
+                        keyExtractor={(item) => item.step}
+                    />
 
-                <Text style={styles.routineTitle}>Evening Routine</Text>
-                <FlatList
-                    data={skincareRoutine?.evening_routine || []}
-                    renderItem={({item}) => (
-                      <View style={styles.routineItem}>
-                        <Text style={styles.stepText}>{item.step}</Text>
-                        <Text style={styles.productText}>{item.product}</Text>
-                      </View>
-                    )}
-                    keyExtractor={(item) => item.step}
-                />
-            </View>
+                    <Text style={[styles.routineTitle,]}>Evening Routine 🌙</Text>
+                    <FlatList
+                        scrollEnabled={false}
+                        data={skincareRoutine?.evening_routine || []}
+                        renderItem={({item}) => (
+                            <View style={styles.routineItem}>
+                                <Text style={styles.stepText}>{item.step}</Text>
+                                <Text style={styles.productText}>{item.product}</Text>
+                            </View>
+                        )}
+                        keyExtractor={(item) => item.step}
+                    />
+                </View>
+            </ScrollView>
         </View>
     )
 };
@@ -149,8 +170,15 @@ const styles = StyleSheet.create({
         fontFamily: 'Roboto',
         fontSize: 13,
     },
-    routineContainer: {
+    routineScrollContainer: {
         flex: 1,
+        width: '100%',
+    },
+    routineContentContainer: {
+        flexGrow: 1,
+        paddingBottom: 20,
+    },
+    routineContainer: {
         padding: 20,
     },
     routineTitle: {
@@ -167,13 +195,20 @@ const styles = StyleSheet.create({
         borderColor: '#D8DADC',
         borderRadius: 10,
         marginBottom: 10,
+    }, 
+    morningRoutine: {
+        backgroundColor: '#ED6672',
     },
     stepText: {
         fontSize: 16,
+        fontWeight: 'bold',
+        flex: 1,
+        marginRight: 10,
     },
     productText: {
         fontSize: 16,
-        flexWrap: 'wrap',
+        flex: 2,
+        textAlign: 'right',
     }
 })
 

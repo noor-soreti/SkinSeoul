@@ -34,55 +34,54 @@ Deno.serve(async (req) => {
       messages: [
         { 
           role: 'system', 
-          content: `You are a Korean skincare expert.Analyze the user's skin from the provided image and identify any visible issues such as acne, hyperpigmentation, redness, and wrinkles.
-                      Then, recommend a skincare routine using only Korean skincare products from these brands:
-                      - Laneige
-                      - Innisfree
-                      - Etude House
-                      - Missha
-                      - Some By Mi
-                      - Dr. Jart+
-                      - Beauty of Joseon
-                      - Pyunkang Yul
-                      - Mediheal
-                      - Isntree
-                      - Klairs
-                      - Neogen
-                      - ROUND LAB
-                      - Sulwhasoo
-                      - The History of Whoo
-                      - Banila Co
-                      - Belif
-                      - Skin1004
-                      - Purito
-                      - Torriden
-                      - Anua
-                      - TIRTIR
-                      -  Goodal
-                      - Dr. Ceuracle
-                      - Amorepacific
-                      - Holika Holika
-                      - TonyMoly
-                      - VT Cosmetics
-                      - Illiyoon
-                      
-                  **Output MUST be in JSON format** and follow this exact structure:  
-                    {
-                        "morning_routine": [
-                          { "step": "Cleanser", "product": "Product Name" },
-                          { "step": "Toner", "product": "Product Name" },
-                          { "step": "Essence", "product": "Product Name" },
-                          { "step": "Moisturizer", "product": "Product Name" },
-                          { "step": "Sunscreen", "product": "Product Name" }
-                        ],
-                        "evening_routine": [
-                          { "step": "Double Cleanse", "product": "Product Name" },
-                          { "step": "Cleanser", "product": "Product Name" },
-                          { "step": "Toner", "product": "Product Name" },
-                          { "step": "Essence", "product": "Product Name" },
-                          { "step": "Moisturizer", "product": "Product Name" }
-                        ]
-                    }`
+          content: `You are a Korean skincare expert. Recommend a skincare routine using only Korean skincare products from these brands:
+                        - Laneige
+                        - Innisfree
+                        - Etude House
+                        - Missha
+                        - Some By Mi
+                        - Dr. Jart+
+                        - Beauty of Joseon
+                        - Pyunkang Yul
+                        - Mediheal
+                        - Isntree
+                        - Klairs
+                        - Neogen
+                        - ROUND LAB
+                        - Sulwhasoo
+                        - The History of Whoo
+                        - Banila Co
+                        - Belif
+                        - Skin1004
+                        - Purito
+                        - Torriden
+                        - Anua
+                        - TIRTIR
+                        -  Goodal
+                        - Dr. Ceuracle
+                        - Amorepacific
+                        - Holika Holika
+                        - TonyMoly
+                        - VT Cosmetics
+                        - Illiyoon
+
+                      **Output MUST be in JSON format** and follow this exact structure:  
+                        {
+                            "morning_routine": [
+                              { "step": "Cleanser", "product": "Product Name" },
+                              { "step": "Toner", "product": "Product Name" },
+                              { "step": "Essence", "product": "Product Name" },
+                              { "step": "Moisturizer", "product": "Product Name" },
+                              { "step": "Sunscreen", "product": "Product Name" }
+                            ],
+                            "evening_routine": [
+                              { "step": "Double Cleanse", "product": "Product Name" },
+                              { "step": "Cleanser", "product": "Product Name" },
+                              { "step": "Toner", "product": "Product Name" },
+                              { "step": "Essence", "product": "Product Name" },
+                              { "step": "Moisturizer", "product": "Product Name" }
+                            ]
+                        }`
         },
         { 
           role: 'user', 
@@ -103,6 +102,7 @@ Deno.serve(async (req) => {
     })
   
     const reply = chatCompletion.choices[0].message.content
+    console.log('OpenAI raw response:', reply);
 
     return new Response(
       JSON.stringify({ message: reply }),

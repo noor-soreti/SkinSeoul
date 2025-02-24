@@ -24,8 +24,6 @@ interface RoutineStepItemProps {
 
 export default function RoutineStepItem({ step, onPress, onSkip }: RoutineStepItemProps) {
   const swipeableRef = useRef<Swipeable>(null);
-
-  console.log(step.image_path);
   
 
   const renderRightActions = () => (
@@ -60,7 +58,7 @@ export default function RoutineStepItem({ step, onPress, onSkip }: RoutineStepIt
           </View>
           
           <View style={styles.middleSection}>
-            <Text style={styles.productName}>{step.name}</Text>
+            <Text style={styles.productName}>{step.product_name}</Text>
             <View style={styles.stepContainer}>
               <Text style={styles.stepText}>Step {step.step_number}</Text>
             </View>
