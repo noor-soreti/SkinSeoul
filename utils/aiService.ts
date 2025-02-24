@@ -1,3 +1,4 @@
+import { getData, getObject } from './storageHelper';
 import { supabase } from './supabase';
 
 export type AIServiceError = {
@@ -7,12 +8,12 @@ export type AIServiceError = {
 
 export async function generateSkincareRoutine(): Promise<string> {
   try {
+    const age = await getData('age');
+    const goals = await getObject('goals');
     const { data, error } = await supabase.functions.invoke('openai', {
       method: 'POST',
-      body: { 
-        query: 'Generate a Korean skincare routine' // We can enhance this query later
-      }
-    });
+      body: { goals: goals, age: age }
+      });
 
     if (error) throw error;
     

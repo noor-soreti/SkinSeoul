@@ -9,14 +9,21 @@ import { set, z } from "zod";
 import RoutineView from "./RoutineView";
 import { Image } from "expo-image";
 import { supabase } from '@/utils/supabase'
+import { getData } from '@/utils/storageHelper';
+import { generateSkincareRoutine } from '@/utils/aiService';
 
-const OnboardingCard8 = ({width, isActive, setSkincareRoutine, skincareRoutine}: any) => {
+const OnboardingCard8 = ({width, isActive, setDisableButton, setSkincareRoutine, skincareRoutine}: any) => {
     const [ isLoading, setIsLoading ] = useState(true);
     const [ aiResponse, setAiResponse ] = useState<string>('');
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         if (isActive) {
+            if (skincareRoutine.length === 0) {
+                setDisableButton(true);
+            } else {
+                setDisableButton(false);
+            }
             setIsLoading(false);
         //   const fetchRoutine = async () => {
         //     const userData = {
@@ -60,14 +67,10 @@ const OnboardingCard8 = ({width, isActive, setSkincareRoutine, skincareRoutine}:
     const handlePress = async () => {
         setLoading(true);
         try {
-            const { data, error } = await supabase.functions.invoke('openai', {
-            method: 'POST',
-            body: { query: 'What is the capital of the United States?' }
-            });
-    
-            if (error) throw error;
-            console.log('Response:', data);
-            Alert.alert('Success', data.message);
+            const response = await generateSkincareRoutine();
+            setSkincareRoutine(response);
+            console.log('Response:', response);
+            Alert.alert('Success', response);
         } catch (error: any) {
             console.error('Error:', error);
             Alert.alert('Error', error.message || 'Something went wrong');

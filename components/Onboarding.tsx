@@ -171,7 +171,7 @@ export default function Onboarding ({onClose}: Props) {
                 <OnboardingCard2 width={ITEM_SIZE} isActive={step === 1} setDisableButton={setDisableButton} setAge={setAge} age={age} />
                 <OnboardingCard6 width={ITEM_SIZE} isActive={step === 2} setDisableButton={setDisableButton} setGoals={setGoals} goals={goals} />
                 <OnboardingCard7 width={ITEM_SIZE} isActive={step === 3} setDisableButton={setDisableButton} setScan={setScan} />
-                <OnboardingCard8 width={ITEM_SIZE} isActive={step === 4} setSkincareRoutine={setSkincareRoutine} skincareRoutine={skincareRoutine} />
+                <OnboardingCard8 width={ITEM_SIZE} isActive={step === 4} setDisableButton={setDisableButton} setSkincareRoutine={setSkincareRoutine} skincareRoutine={skincareRoutine} />
             </Animated.ScrollView>
 
             <TouchableOpacity style={[defaultStyles.onboardingButton, disableButton && defaultStyles.disableOnboardingButton ]} onPress={onNextPressed} disabled={disableButton} >

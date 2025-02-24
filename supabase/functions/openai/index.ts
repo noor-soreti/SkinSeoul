@@ -16,7 +16,7 @@ Deno.serve(async (req) => {
       })
     }
 
-    const { query } = await req.json()
+    const { goals, age } = await req.json()
     const apiKey = Deno.env.get('OPENAI_API_KEY')
 
     if (!apiKey) {
@@ -31,7 +31,72 @@ Deno.serve(async (req) => {
     })
     
     const chatCompletion = await openai.chat.completions.create({
-      messages: [{ role: 'user', content: query }],
+      messages: [
+        { 
+          role: 'system', 
+          content: `You are a Korean skincare expert.Analyze the user's skin from the provided image and identify any visible issues such as acne, hyperpigmentation, redness, and wrinkles.
+                      Then, recommend a skincare routine using only Korean skincare products from these brands:
+                      - Laneige
+                      - Innisfree
+                      - Etude House
+                      - Missha
+                      - Some By Mi
+                      - Dr. Jart+
+                      - Beauty of Joseon
+                      - Pyunkang Yul
+                      - Mediheal
+                      - Isntree
+                      - Klairs
+                      - Neogen
+                      - ROUND LAB
+                      - Sulwhasoo
+                      - The History of Whoo
+                      - Banila Co
+                      - Belif
+                      - Skin1004
+                      - Purito
+                      - Torriden
+                      - Anua
+                      - TIRTIR
+                      -  Goodal
+                      - Dr. Ceuracle
+                      - Amorepacific
+                      - Holika Holika
+                      - TonyMoly
+                      - VT Cosmetics
+                      - Illiyoon
+                      
+                  **Output MUST be in JSON format** and follow this exact structure:  
+                    {
+                        "morning_routine": [
+                          { "step": "Cleanser", "product": "Product Name" },
+                          { "step": "Toner", "product": "Product Name" },
+                          { "step": "Essence", "product": "Product Name" },
+                          { "step": "Moisturizer", "product": "Product Name" },
+                          { "step": "Sunscreen", "product": "Product Name" }
+                        ],
+                        "evening_routine": [
+                          { "step": "Double Cleanse", "product": "Product Name" },
+                          { "step": "Cleanser", "product": "Product Name" },
+                          { "step": "Toner", "product": "Product Name" },
+                          { "step": "Essence", "product": "Product Name" },
+                          { "step": "Moisturizer", "product": "Product Name" }
+                        ]
+                    }`
+        },
+        { 
+          role: 'user', 
+          content: [
+            {
+              type: 'text',
+              text: `Build a Korean skincare routine with only Korean skincare products based on the following user details:
+                        - Age: ${age}
+                        - Goals: ${goals}
+                    `
+            }
+          ]
+        }
+      ],
       // Choose model from here: https://platform.openai.com/docs/models
       model: "gpt-4o-mini",
       stream: false,
