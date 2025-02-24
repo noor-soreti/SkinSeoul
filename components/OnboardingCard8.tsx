@@ -1,6 +1,6 @@
 import React from "react";
 import { defaultStyles } from "@/constants/Styles";
-import { ActivityIndicator, Alert, FlatList, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, Alert, FlatList, StyleSheet, Text, View, TouchableOpacity } from "react-native";
 import { useEffect, useState } from "react";
 import OpenAI from "openai";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -13,45 +13,66 @@ import { supabase } from '@/utils/supabase'
 const OnboardingCard8 = ({width, isActive, setSkincareRoutine, skincareRoutine}: any) => {
     const [ isLoading, setIsLoading ] = useState(true);
     const [ aiResponse, setAiResponse ] = useState<string>('');
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         if (isActive) {
-          const fetchRoutine = async () => {
-            const userData = {
-                age: await AsyncStorage.getItem("age"),
-                goals: await AsyncStorage.getItem("goals"),
-            }
-            await openAICall(userData);
-          }
-          fetchRoutine();
+            setIsLoading(false);
+        //   const fetchRoutine = async () => {
+        //     const userData = {
+        //         age: await AsyncStorage.getItem("age"),
+        //         goals: await AsyncStorage.getItem("goals"),
+        //     }
+        //     await openAICall(userData);
+        //   }
+        //   fetchRoutine();
         }
     }, [isActive])      
 
-    const openAICall = async (userData: { age: any; goals: any}) => {
+    // const openAICall = async (userData: { age: any; goals: any}) => {
+    //     try {
+    //         // Call the Supabase Edge Function
+    //         const response = await supabase.functions.invoke('openai', {
+    //             body: { userData },
+    //             method: 'POST',
+    //             headers: {
+    //                 'Content-Type': 'application/json'
+    //             }
+    //         })
+            
+    //         console.log('Full response:', response);  // Log the full response
+    //         console.log('Data:', response.data);      // Log just the data
+            
+    //         if (!response.data) {
+    //             throw new Error('No data received from edge function');
+    //         }
+            
+    //         // setSkincareRoutine(data);
+    //         setAiResponse(response.data.message);
+    //         setIsLoading(false);
+    //     } catch (error) {
+    //         console.error("Error:", error);
+    //         Alert.alert("Error calling AI service. Please try again.");
+    //         setIsLoading(false);
+    //     }
+    // }
+
+    const handlePress = async () => {
+        setLoading(true);
         try {
-            // Call the Supabase Edge Function
-            const response = await supabase.functions.invoke('openai', {
-                body: { userData },
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            })
-            
-            console.log('Full response:', response);  // Log the full response
-            console.log('Data:', response.data);      // Log just the data
-            
-            if (!response.data) {
-                throw new Error('No data received from edge function');
-            }
-            
-            // setSkincareRoutine(data);
-            setAiResponse(response.data.message);
-            setIsLoading(false);
-        } catch (error) {
-            console.error("Error:", error);
-            Alert.alert("Error calling AI service. Please try again.");
-            setIsLoading(false);
+            const { data, error } = await supabase.functions.invoke('openai', {
+            method: 'POST',
+            body: { query: 'What is the capital of the United States?' }
+            });
+    
+            if (error) throw error;
+            console.log('Response:', data);
+            Alert.alert('Success', data.message);
+        } catch (error: any) {
+            console.error('Error:', error);
+            Alert.alert('Error', error.message || 'Something went wrong');
+        } finally {
+            setLoading(false);
         }
     }
 
@@ -71,6 +92,10 @@ const OnboardingCard8 = ({width, isActive, setSkincareRoutine, skincareRoutine}:
             <Text style={defaultStyles.onboardingCaption}>
                 We'll let our AI model analyze your skin to provide personalized recommendations
             </Text>
+
+            <TouchableOpacity onPress={handlePress}>
+                <Text>Generate Routine</Text>
+            </TouchableOpacity>
             
             <View style={styles.routineContainer}>
                 <Text style={styles.routineTitle}>Morning Routine</Text>

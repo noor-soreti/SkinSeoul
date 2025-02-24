@@ -1,5 +1,11 @@
 import * as SQLite from 'expo-sqlite';
-import { RoutineStep, CompletionStatus, DatabaseErrorType, StepCompletion } from './types/database';
+import { 
+  RoutineStep, 
+  CompletionStatus, 
+  DatabaseErrorType, 
+  StepCompletion,
+  ProductType 
+} from './types/database';
 
 let db: SQLite.SQLiteDatabase;
 
@@ -20,16 +26,27 @@ export async function initDatabase() {
 
 async function createTables() {
   try {
+    // routine_steps -> stores skincare routine steps
+    // step_completions -> tracks which steps were completed on a given date
     await db.execAsync(`
       PRAGMA journal_mode = WAL;
       CREATE TABLE IF NOT EXISTS routine_steps (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT NOT NULL,
+        product_name TEXT NOT NULL,
+        product_type TEXT NOT NULL CHECK(
+          product_type IN (
+            'Double Cleanse',
+            'Cleanser', 
+            'Toner', 
+            'Essence', 
+            'Moisturizer', 
+            'Sunscreen'
+          )
+        ),
         step_number INTEGER NOT NULL,
         image_path TEXT,
         routine_type TEXT NOT NULL
       );
-
       CREATE TABLE IF NOT EXISTS step_completions (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         date TEXT NOT NULL,
@@ -55,8 +72,8 @@ async function createTables() {
 export async function insertRoutineStep(step: Omit<RoutineStep, 'id'>) {
   try {
     const result = await db.runAsync(
-      'INSERT INTO routine_steps (name, step_number, image_path, routine_type) VALUES (?, ?, ?, ?)',
-      [step.name, step.step_number, step.image_path, step.routine_type]
+      'INSERT INTO routine_steps (product_name, product_type, step_number, image_path, routine_type) VALUES (?, ?, ?, ?, ?)',
+      [step.product_name, step.product_type, step.step_number, step.image_path, step.routine_type]
     );
     return result;
   } catch (e) {
@@ -160,31 +177,36 @@ export async function getStepsWithCompletions(
 export async function insertDummyData() {
   const morningSteps: Omit<RoutineStep, 'id'>[] = [
     {
-      name: "COSRX Low pH Good Morning Gel Cleanser",
+      product_name: "COSRX Low pH Good Morning Gel Cleanser",
+      product_type: "Cleanser",
       step_number: 1,
       image_path: "cleanser.png",
       routine_type: "morning" as const
     },
     {
-      name: "Klairs Supple Preparation Unscented Toner",
+      product_name: "Klairs Supple Preparation Unscented Toner",
+      product_type: "Toner",
       step_number: 2,
       image_path: "toner.png",
       routine_type: "morning" as const
     },
     {
-      name: "COSRX Advanced Snail 96 Mucin Essence",
+      product_name: "COSRX Advanced Snail 96 Mucin Essence",
+      product_type: "Essence",
       step_number: 3,
       image_path: "essence.png",
       routine_type: "morning" as const
     },
     {
-      name: "ILLIYOON Ceramide Ato Concentrate Cream",
+      product_name: "ILLIYOON Ceramide Ato Concentrate Cream",
+      product_type: "Moisturizer",
       step_number: 4,
       image_path: "moisturizer.png",
       routine_type: "morning" as const
     },
     {
-      name: "Beauty of Joseon Relief Sun: Rice + Probiotics",
+      product_name: "Beauty of Joseon Relief Sun: Rice + Probiotics",
+      product_type: "Sunscreen",
       step_number: 5,
       image_path: "sunscreen.png",
       routine_type: "morning" as const
@@ -193,31 +215,36 @@ export async function insertDummyData() {
 
   const eveningSteps: Omit<RoutineStep, 'id'>[] = [
     {
-      name: "Banila Co Clean It Zero Cleansing Balm",
+      product_name: "Banila Co Clean It Zero Cleansing Balm",
+      product_type: "Double Cleanse",
       step_number: 1,
       image_path: "oil-cleanser.png",
       routine_type: "evening" as const
     },
     {
-      name: "COSRX Low pH Good Morning Gel Cleanser",
+      product_name: "COSRX Low pH Good Morning Gel Cleanser",
+      product_type: "Cleanser",
       step_number: 2,
       image_path: "cleanser.png",
       routine_type: "evening" as const
     },
     {
-      name: "Klairs Supple Preparation Unscented Toner",
+      product_name: "Klairs Supple Preparation Unscented Toner",
+      product_type: "Toner",
       step_number: 3,
       image_path: "toner.png",
       routine_type: "evening" as const
     },
     {
-      name: "COSRX Advanced Snail 96 Mucin Essence",
+      product_name: "COSRX Advanced Snail 96 Mucin Essence",
+      product_type: "Essence",
       step_number: 4,
       image_path: "essence.png",
       routine_type: "evening" as const
     },
     {
-      name: "ILLIYOON Ceramide Ato Concentrate Cream",
+      product_name: "ILLIYOON Ceramide Ato Concentrate Cream",
+      product_type: "Moisturizer",
       step_number: 5,
       image_path: "moisturizer.png",
       routine_type: "evening" as const

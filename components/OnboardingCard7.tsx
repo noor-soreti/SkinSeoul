@@ -93,7 +93,8 @@ const OnboardingCard7 = ({ width, setScan, isActive, setDisableButton }: Onboard
                 style={styles.scanButton} 
                 onPress={startScan}
                 >
-                    <Ionicons name="scan" size={50} color="black" />
+                    <Image source={require('@/assets/images/icons/face-scan.png')} style={{width: 70, height: 70}} />
+                    {/* <Ionicons name="scan" size={50} color="black" /> */}
                     <Text style={styles.scanText}> Start Scan</Text>
                 </TouchableOpacity>
 

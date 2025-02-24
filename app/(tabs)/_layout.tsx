@@ -21,29 +21,30 @@ const TabLayout = () => {
                 name="index"
                 options={{
                 title: 'Home',
-                tabBarIcon: ({ focused }) => 
-                (
-                  focused ?
-                  <Image source={require('@/assets/images/tabIcons/home-active.png')} style={{ width: 24, height: 24  }} />
-                  :
-                  <Image source={require('@/assets/images/tabIcons/home.png')} style={{ width: 24, height: 24  }} />
+                // tabBarIcon: ({ focused }) => 
+                // (
+                //   focused ?
+                //   <Image source={require('@/assets/images/tabIcons/home-active.png')} style={{ width: 24, height: 24  }} />
+                //   :
+                //   <Image source={require('@/assets/images/tabIcons/home.png')} style={{ width: 24, height: 24  }} />
 
-                )
-                }}
+                // )
+                }
+              }
             />
 
             <Tabs.Screen
                 name="profile"
                 options={{
                 title: 'Profile',
-                tabBarIcon: ({ focused }) => 
-                  (
-                    focused ?
-                    <Image source={require('@/assets/images/tabIcons/profile-active.png')} style={{ width: 24, height: 24  }} />
-                    :
-                    <Image source={require('@/assets/images/tabIcons/profile.png')} style={{ width: 24, height: 24  }} />
+                // tabBarIcon: ({ focused }) => 
+                //   (
+                //     focused ?
+                //     <Image source={require('@/assets/images/tabIcons/profile-active.png')} style={{ width: 24, height: 24  }} />
+                //     :
+                //     <Image source={require('@/assets/images/tabIcons/profile.png')} style={{ width: 24, height: 24  }} />
   
-                  )
+                //   )
                 }}
             />
 

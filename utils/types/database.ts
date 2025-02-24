@@ -1,6 +1,15 @@
+export type ProductType = 
+  | 'Double Cleanse'
+  | 'Cleanser' 
+  | 'Toner' 
+  | 'Essence' 
+  | 'Moisturizer' 
+  | 'Sunscreen';
+
 export type RoutineStep = {
   id: number;
-  name: string;
+  product_name: string;
+  product_type: ProductType;
   step_number: number;
   image_path: string;
   routine_type: 'morning' | 'evening';
