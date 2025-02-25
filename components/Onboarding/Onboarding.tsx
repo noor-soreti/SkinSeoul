@@ -3,12 +3,12 @@ import Animated, { useAnimatedRef, useDerivedValue, useSharedValue, scrollTo } f
 import { useEffect, useState } from "react";
 import { defaultStyles } from "@/constants/Styles";
 import Entypo from '@expo/vector-icons/Entypo';
-import OnboardingCard2 from "./OnboardingCard2";
-import OnboardingCard6 from "./OnboardingCard6";
+import OnboardingCard2 from "../OnboardingCard2";
+import OnboardingCard6 from "../OnboardingCard6";
 import { router } from "expo-router";
-import OnboardingCard7 from "./OnboardingCard7";
+import OnboardingCard7 from "../OnboardingCard7";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import OnboardingCard8 from "./OnboardingCard8";
+import OnboardingCard8 from "../OnboardingCard8";
 import { getData, getObject, storeData, storeObject } from "@/utils/storageHelper";
 
 type Props = {
@@ -100,7 +100,7 @@ export default function Onboarding ({onClose}: Props) {
         if (getScan) {
             console.log('asyncScan:', getScan);
             setScan(getScan);
-            setDisableButton(false);
+            // setDisableButton(false);
         }
     }
 

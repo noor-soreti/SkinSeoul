@@ -1,4 +1,4 @@
-import Onboarding from "@/components/Onboarding"
+import Onboarding from "@/components/Onboarding/Onboarding"
 import { defaultStyles } from "@/constants/Styles"
 import { getData, getObject } from "@/utils/storageHelper"
 import AsyncStorage from "@react-native-async-storage/async-storage"
@@ -17,6 +17,18 @@ import RoutineToggle from '@/components/RoutineToggle'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 const IS_ONBOARDED = "IS_ONBOARDED"
+
+function getGreeting() {
+    const hour = new Date().getHours();
+    
+    if (hour >= 5 && hour < 12) {
+        return 'Morning';
+    } else if (hour >= 12 && hour < 17) {
+        return 'Afternoon';
+    } else {
+        return 'Evening';
+    }
+}
 
 const HomeScreen = () => {
     const [ showOnboarding, setShowOnboarding ] = useState(false)
@@ -164,12 +176,15 @@ const HomeScreen = () => {
     const loadRoutineSteps = async () => {
         setLoadingState(prev => ({ ...prev, isLoading: true, error: null }));
         try {
-            // console.log('Loading routine for:', selectedRoutine);
+            // Format date to YYYY-MM-DD for database consistency
+            const formattedDate = selectedDate.toISOString().split('T')[0];
+            console.log('Loading routine for date:', formattedDate, 'type:', selectedRoutine);
+            
             const steps = await getStepsWithCompletions(
-                selectedDate.toISOString(), 
+                formattedDate,  // Use formatted date instead of full ISO string
                 selectedRoutine
             );
-            // console.log('Retrieved steps:', steps);
+            console.log('Retrieved steps from database:', steps);
             setRoutineSteps(steps);
             setLoadingState({
                 isLoading: false,
@@ -190,7 +205,7 @@ const HomeScreen = () => {
     useEffect(() => {
         // console.log('selectedRoutine changed, loading steps for:', selectedRoutine);
         loadRoutineSteps();
-    }, [selectedRoutine]);
+    }, [selectedRoutine, selectedDate]);
 
     // Loading and Error components
     const LoadingView = () => (
@@ -225,7 +240,9 @@ const HomeScreen = () => {
             <LinearGradientSection>
             <View style={[defaultStyles.topContainer, styles.topContainerAdjust]}>
                 <View style={styles.titleContainer}>
-                    <Text ref={textRef} style={defaultStyles.screenTitle}>Your Daily Skincare Routine</Text>
+                    <Text ref={textRef} style={defaultStyles.screenTitle}>
+                        {'Good\n' + getGreeting() + '!'}
+                    </Text>
                     <ScanButton onPressScan={handleScan} />
                 </View>                
             </View>

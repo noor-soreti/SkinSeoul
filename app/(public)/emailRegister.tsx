@@ -31,7 +31,7 @@ const EmailRegister = () => {
         <Entypo name="chevron-left" size={24} color="black" />
       </TouchableOpacity>
       <View style={defaultStyles.container}>
-        <Text style={[styles.title, {marginBottom: 40}]}>Register for a new account</Text>
+      <Text style={[defaultStyles.loginTitle, {marginBottom: 40}]}> Register for a new <Text style={{color: '#ED6672', fontFamily: 'NobileBold'}}>SkinSeoulAI</Text> account</Text>
         <TextInput style={styles.textInput} placeholder="Email" value={email} onChangeText={setEmail} autoCapitalize="none"/>
         <TextInput style={styles.textInput} placeholder="Password" value={password} onChangeText={setPassword} autoCapitalize="none" secureTextEntry />
         <TouchableOpacity style={styles.button} onPress={register} >
@@ -68,14 +68,12 @@ const styles = StyleSheet.create({
   button: {
     padding: 15,
     borderRadius: 10,
-    borderWidth: 1,
-    // borderColor: 'white',
+    borderWidth: 2,
     alignItems: 'center',
     justifyContent: 'center',
     width: '90%',
     marginVertical: 5,
-    borderColor: 'white',
-    backgroundColor: '#ED6672',
+    borderColor: '#ED6672',
     shadowColor: '#e0e0e0', // Shadow color to match the button for a cohesive look
     shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.5,
@@ -83,7 +81,7 @@ const styles = StyleSheet.create({
     elevation: 5,  
   },
   text: {
-    color: '#FFFFFF',
+    color: '#ED6672',
     fontSize: 18, 
     fontWeight: '600',
   },

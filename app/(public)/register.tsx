@@ -28,7 +28,7 @@ const Register = () => {
     <Background>
       <View style={defaultStyles.container}>
         <View style={{alignItems: 'center', marginBottom: 40}}>
-          <Text style={defaultStyles.loginTitle}><Text style={{color: '#ED6672', fontFamily: 'NobileBold'}}>SkinSeoulAI</Text> welcomes you1</Text>
+          <Text style={defaultStyles.loginTitle}>Welcome to <Text style={{color: '#ED6672', fontFamily: 'NobileBold'}}>SkinSeoulAI</Text></Text>
           <Text style={{fontFamily: 'NobileRegular', fontSize: 12}}>Your korean skincare journey starts here!</Text>
         </View>
         {

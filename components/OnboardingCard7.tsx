@@ -36,6 +36,7 @@ const OnboardingCard7 = ({ width, setScan, isActive, setDisableButton }: Onboard
                 "Simulator Detected",
                 "Camera functionality is only available on physical devices."
             );
+            setDisableButton(false);
             return;
         }
 

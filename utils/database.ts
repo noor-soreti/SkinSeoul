@@ -185,17 +185,22 @@ export async function getStepsWithCompletions(
   routineType: 'morning' | 'evening'
 ): Promise<(RoutineStep & { status: CompletionStatus | null })[]> {
   try {
-    const database = await ensureDatabase();  // Ensure db is initialized
-    console.log('Getting steps with completions for:', { date, routineType });
-    return await database.getAllAsync(`
+    const database = await ensureDatabase();
+    
+    const steps = await database.getAllAsync(`
       SELECT 
         rs.*,
-        sc.status
+        sc.status,
+        sc.date as completion_date
       FROM routine_steps rs
-      LEFT JOIN step_completions sc ON rs.id = sc.step_id AND sc.date = ?
+      LEFT JOIN step_completions sc 
+        ON rs.id = sc.step_id 
+        AND sc.date = ?
       WHERE rs.routine_type = ?
       ORDER BY rs.step_number
-    `, [date, routineType]);
+    `, [date, routineType]) as (RoutineStep & { status: CompletionStatus | null })[];
+    
+    return steps;
   } catch (e) {
     const error: DatabaseErrorType = {
       message: `Failed to get steps with completions for ${routineType} routine on ${date}`,
@@ -206,6 +211,81 @@ export async function getStepsWithCompletions(
     console.error(error);
     throw error;
   }
+}
+
+
+export async function storeRoutine(routine: AIRoutineResponse): Promise<void> {
+  try {
+    console.log('Starting to store routine in database...');
+    
+    // First, clear existing routine steps
+    await db.runAsync('DELETE FROM routine_steps');
+    console.log('Cleared existing routine steps');
+    
+    // Store morning routine
+    for (let i = 0; i < routine.morning_routine.length; i++) {
+      const step = routine.morning_routine[i];
+      await insertRoutineStep({
+        product_name: step.product,
+        product_type: step.step as ProductType,
+        step_number: i + 1,
+        image_path: `${step.step.toLowerCase()}.png`,
+        routine_type: 'morning'
+      });
+    }
+    console.log('Stored morning routine');
+
+    // Store evening routine
+    for (let i = 0; i < routine.evening_routine.length; i++) {
+      const step = routine.evening_routine[i];
+      await insertRoutineStep({
+        product_name: step.product,
+        product_type: step.step as ProductType,
+        step_number: i + 1,
+        image_path: `${step.step.toLowerCase()}.png`,
+        routine_type: 'evening'
+      });
+    }
+    console.log('Stored evening routine');
+
+    // Verify storage by retrieving the stored routines
+    const morningSteps = await getRoutineSteps('morning');
+    const eveningSteps = await getRoutineSteps('evening');
+    console.log('Verified stored routines:', { 
+      morning: morningSteps.length, 
+      evening: eveningSteps.length 
+    });
+
+  } catch (error) {
+    const dbError: DatabaseErrorType = {
+      message: 'Failed to store routine in database',
+      originalError: error instanceof Error ? error.message : String(error),
+      operation: 'create',
+      table: 'routine_steps'
+    };
+    console.error(dbError);
+    throw dbError;
+  }
+}
+
+export async function clearDatabase() {
+    try {
+        const database = await ensureDatabase();
+        await database.execAsync(`
+            DROP TABLE IF EXISTS step_completions;
+            DROP TABLE IF EXISTS routine_steps;
+        `);
+        await createTables(); // Recreate empty tables
+        console.log('Database cleared successfully');
+    } catch (e) {
+        const error: DatabaseErrorType = {
+            message: 'Failed to clear database',
+            originalError: e instanceof Error ? e.message : String(e),
+            operation: 'delete'
+        };
+        console.error(error);
+        throw error;
+    }
 }
 
 export async function insertDummyData() {
@@ -287,59 +367,5 @@ export async function insertDummyData() {
 
   for (const step of [...morningSteps, ...eveningSteps]) {
     await insertRoutineStep(step);
-  }
-}
-
-export async function storeRoutine(routine: AIRoutineResponse): Promise<void> {
-  try {
-    console.log('Starting to store routine in database...');
-    
-    // First, clear existing routine steps
-    await db.runAsync('DELETE FROM routine_steps');
-    console.log('Cleared existing routine steps');
-    
-    // Store morning routine
-    for (let i = 0; i < routine.morning_routine.length; i++) {
-      const step = routine.morning_routine[i];
-      await insertRoutineStep({
-        product_name: step.product,
-        product_type: step.step as ProductType,
-        step_number: i + 1,
-        image_path: `${step.step.toLowerCase()}.png`,
-        routine_type: 'morning'
-      });
-    }
-    console.log('Stored morning routine');
-
-    // Store evening routine
-    for (let i = 0; i < routine.evening_routine.length; i++) {
-      const step = routine.evening_routine[i];
-      await insertRoutineStep({
-        product_name: step.product,
-        product_type: step.step as ProductType,
-        step_number: i + 1,
-        image_path: `${step.step.toLowerCase()}.png`,
-        routine_type: 'evening'
-      });
-    }
-    console.log('Stored evening routine');
-
-    // Verify storage by retrieving the stored routines
-    const morningSteps = await getRoutineSteps('morning');
-    const eveningSteps = await getRoutineSteps('evening');
-    console.log('Verified stored routines:', { 
-      morning: morningSteps.length, 
-      evening: eveningSteps.length 
-    });
-
-  } catch (error) {
-    const dbError: DatabaseErrorType = {
-      message: 'Failed to store routine in database',
-      originalError: error instanceof Error ? error.message : String(error),
-      operation: 'create',
-      table: 'routine_steps'
-    };
-    console.error(dbError);
-    throw dbError;
   }
 }

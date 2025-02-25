@@ -38,7 +38,7 @@ const RootLayout = () => {
   // }, [fontsLoaded, initializing]);
 
   const onAuthStateChanged = (user: FirebaseAuthTypes.User | null) => {
-    // console.log("onAuthStateChanged", user);
+    console.log("onAuthStateChanged", user);
     setUser(user)
     if (initializing) setInitializing(false)
   }

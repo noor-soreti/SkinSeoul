@@ -25,6 +25,8 @@ interface RoutineStepItemProps {
 export default function RoutineStepItem({ step, onPress, onSkip }: RoutineStepItemProps) {
   const swipeableRef = useRef<Swipeable>(null);
   
+  console.log(step);
+  
 
   const renderRightActions = () => (
     <TouchableOpacity 

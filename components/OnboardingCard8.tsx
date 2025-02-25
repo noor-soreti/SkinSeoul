@@ -20,12 +20,17 @@ const OnboardingCard8 = ({width, isActive, setDisableButton, setSkincareRoutine,
 
     useEffect(() => {
         if (isActive) {
-            if (skincareRoutine.length === 0) {
-                setDisableButton(true);
-            } else {
-                setDisableButton(false);
+            const fetchRoutine = async () => {
+                await openAICall();
             }
-            setIsLoading(false);
+            fetchRoutine();
+
+            // if (skincareRoutine.length === 0) {
+            //     setDisableButton(true);
+            // } else {
+            //     setDisableButton(false);
+            // }
+            // setIsLoading(false);
         //   const fetchRoutine = async () => {
         //     const userData = {
         //         age: await AsyncStorage.getItem("age"),
@@ -37,35 +42,7 @@ const OnboardingCard8 = ({width, isActive, setDisableButton, setSkincareRoutine,
         }
     }, [isActive])      
 
-    // const openAICall = async (userData: { age: any; goals: any}) => {
-    //     try {
-    //         // Call the Supabase Edge Function
-    //         const response = await supabase.functions.invoke('openai', {
-    //             body: { userData },
-    //             method: 'POST',
-    //             headers: {
-    //                 'Content-Type': 'application/json'
-    //             }
-    //         })
-            
-    //         console.log('Full response:', response);  // Log the full response
-    //         console.log('Data:', response.data);      // Log just the data
-            
-    //         if (!response.data) {
-    //             throw new Error('No data received from edge function');
-    //         }
-            
-    //         // setSkincareRoutine(data);
-    //         setAiResponse(response.data.message);
-    //         setIsLoading(false);
-    //     } catch (error) {
-    //         console.error("Error:", error);
-    //         Alert.alert("Error calling AI service. Please try again.");
-    //         setIsLoading(false);
-    //     }
-    // }
-
-    const handlePress = async () => {
+    const openAICall = async () => {
         setLoading(true);
         try {
             const routineData = await generateSkincareRoutine();
@@ -87,14 +64,46 @@ const OnboardingCard8 = ({width, isActive, setDisableButton, setSkincareRoutine,
                 }))
             });
 
-            Alert.alert('Success', 'Your skincare routine has been generated and saved!');
+            // Alert.alert('Success', 'Your skincare routine has been generated and saved!');
         } catch (error: any) {
             console.error('Error:', error);
             Alert.alert('Error', error.message || 'Something went wrong');
         } finally {
             setLoading(false);
+            setIsLoading(false);
         }
     }
+
+    // const handlePress = async () => {
+    //     setLoading(true);
+    //     try {
+    //         const routineData = await generateSkincareRoutine();
+    //         await storeRoutine(routineData);
+
+    //         // Get the stored routine from database
+    //         const morningSteps = await getRoutineSteps('morning');
+    //         const eveningSteps = await getRoutineSteps('evening');
+            
+    //         // Update the UI with database data
+    //         setSkincareRoutine({
+    //             morning_routine: morningSteps.map(step => ({
+    //                 step: step.product_type,
+    //                 product: step.product_name
+    //             })),
+    //             evening_routine: eveningSteps.map(step => ({
+    //                 step: step.product_type,
+    //                 product: step.product_name
+    //             }))
+    //         });
+
+    //         Alert.alert('Success', 'Your skincare routine has been generated and saved!');
+    //     } catch (error: any) {
+    //         console.error('Error:', error);
+    //         Alert.alert('Error', error.message || 'Something went wrong');
+    //     } finally {
+    //         setLoading(false);
+    //     }
+    // }
 
     if (isLoading) {
         return (
@@ -110,12 +119,12 @@ const OnboardingCard8 = ({width, isActive, setDisableButton, setSkincareRoutine,
         <View style={[defaultStyles.onboardingContainer, {width: width}]}>
             <Text style={defaultStyles.onboardingTitle}>Finished!</Text>
             <Text style={defaultStyles.onboardingCaption}>
-                View your AI generated skincare routine below
+                View your AI generated Korean skincare routine below
             </Text>
 
-            <TouchableOpacity onPress={handlePress}>
+            {/* <TouchableOpacity onPress={handlePress}>
                 <Text>Generate Routine</Text>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
             
             <ScrollView style={styles.routineScrollContainer} contentContainerStyle={styles.routineContentContainer}>
                 <View style={styles.routineContainer}>

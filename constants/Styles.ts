@@ -20,8 +20,9 @@ export const defaultStyles = StyleSheet.create({
     },
     loginTitle: {
         fontSize: 20, 
-        fontWeight: '800',
+        // fontWeight: '800',
         fontFamily: 'NobileRegular',
+        textAlign: 'center',
     },
     onboardingContainer: {
         paddingTop: '5%',
@@ -114,8 +115,8 @@ export const defaultStyles = StyleSheet.create({
         height: 250,
         // backgroundColor: ColorPalette.primary,
         paddingTop: '15%',
-        paddingLeft: '5%',
-        paddingRight: '5%',
+        paddingLeft: '10%',
+        paddingRight: '10%',
         paddingBottom: '5%',
         borderBottomEndRadius: 40,
         borderBottomStartRadius: 40,

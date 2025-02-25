@@ -33,7 +33,7 @@ const EmailSignIn = () => {
       <View style={defaultStyles.container}>
       
         {/* <Text style={defaultStyles.loginTitle}>Your Korean Skin Care Journey Starts Here!</Text> */}
-        <Text style={[defaultStyles.loginTitle, {marginBottom: 40}]}>Sign In</Text>
+        <Text style={[defaultStyles.loginTitle, {marginBottom: 40}]}> Sign In to <Text style={{color: '#ED6672', fontFamily: 'NobileBold'}}>SkinSeoulAI</Text></Text>
         <TextInput style={styles.textInput} placeholder="Email" value={email} onChangeText={setEmail} autoCapitalize="none"/>
         <TextInput style={styles.textInput} placeholder="Password" value={password} onChangeText={setPassword} autoCapitalize="none" secureTextEntry />
         <TouchableOpacity style={styles.button} onPress={signIn} >
