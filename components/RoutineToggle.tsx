@@ -11,6 +11,7 @@ export default function RoutineToggle({ selectedRoutine, onToggle }: RoutineTogg
   const buttonWidth = (Dimensions.get('window').width - 48) / 2; // Account for margins and padding
 
   useEffect(() => {
+    console.log('RoutineToggle - selectedRoutine changed to:', selectedRoutine);
     Animated.spring(slideAnim, {
       toValue: selectedRoutine === 'morning' ? 0 : buttonWidth,
       useNativeDriver: true,
@@ -30,7 +31,10 @@ export default function RoutineToggle({ selectedRoutine, onToggle }: RoutineTogg
       ]} />
       <TouchableOpacity 
         style={[styles.toggleButton, { width: buttonWidth }]}
-        onPress={() => onToggle('morning')}
+        onPress={() => {
+          console.log('Morning button pressed');
+          onToggle('morning');
+        }}
       >
         <Text style={[
           styles.buttonText,
@@ -40,7 +44,10 @@ export default function RoutineToggle({ selectedRoutine, onToggle }: RoutineTogg
       
       <TouchableOpacity 
         style={[styles.toggleButton, { width: buttonWidth }]}
-        onPress={() => onToggle('evening')}
+        onPress={() => {
+          console.log('Evening button pressed');
+          onToggle('evening');
+        }}
       >
         <Text style={[
           styles.buttonText,

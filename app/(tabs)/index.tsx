@@ -35,9 +35,11 @@ const HomeScreen = () => {
         visible: false,
         message: ''
     });
+    // tracks which routine is selected
     const [selectedRoutine, setSelectedRoutine] = useState<'morning' | 'evening'>('morning');
     const insets = useSafeAreaInsets();
     const TAB_HEIGHT = 80; 
+    
     
     // initialize the database and insert dummy data if needed
     useEffect(() => {
@@ -46,6 +48,8 @@ const HomeScreen = () => {
                 await initDatabase();
                 // check if we already have steps
                 const existingSteps = await getRoutineSteps('morning');
+                // console.log(existingSteps);
+                
                 if (existingSteps.length === 0) {
                     await insertDummyData();
                 }
@@ -73,7 +77,7 @@ const HomeScreen = () => {
                 console.log("FIRST LAUNCH");
             }
             const skincareRoutine = await getObject('skincareRoutine');
-            console.log('skincareRoutine', skincareRoutine);
+            // console.log('skincareRoutine: ', skincareRoutine);
         }
         checkFirstLaunch()
     }, [])
@@ -161,10 +165,12 @@ const HomeScreen = () => {
     const loadRoutineSteps = async () => {
         setLoadingState(prev => ({ ...prev, isLoading: true, error: null }));
         try {
+            // console.log('Loading routine for:', selectedRoutine);
             const steps = await getStepsWithCompletions(
                 selectedDate.toISOString(), 
                 selectedRoutine
             );
+            // console.log('Retrieved steps:', steps);
             setRoutineSteps(steps);
             setLoadingState({
                 isLoading: false,
@@ -180,6 +186,12 @@ const HomeScreen = () => {
             });
         }
     }
+
+    // Add useEffect to watch selectedRoutine changes
+    useEffect(() => {
+        // console.log('selectedRoutine changed, loading steps for:', selectedRoutine);
+        loadRoutineSteps();
+    }, [selectedRoutine]);
 
     // Loading and Error components
     const LoadingView = () => (
@@ -235,8 +247,9 @@ const HomeScreen = () => {
                 <RoutineToggle 
                     selectedRoutine={selectedRoutine}
                     onToggle={(routine) => {
+                        console.log('Toggle pressed, new routine:', routine);
+                        console.log('Current selectedRoutine before update:', selectedRoutine);
                         setSelectedRoutine(routine);
-                        loadRoutineSteps();
                     }}
                 />
 

@@ -6,7 +6,7 @@ import Swipeable from 'react-native-gesture-handler/Swipeable';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 const routineImages = {
-  'oil-cleanser.png': require('@/assets/images/routineIcons/oil-cleanser.png'),
+  'double cleanse.png': require('@/assets/images/routineIcons/oil-cleanser.png'),
   'toner.png': require('@/assets/images/routineIcons/toner.png'),
   'essence.png': require('@/assets/images/routineIcons/essence.png'),
   'moisturizer.png': require('@/assets/images/routineIcons/moisturizer.png'),
@@ -132,7 +132,7 @@ const styles = StyleSheet.create({
     borderColor: '#E0E0E0',
   },
   skipButton: {
-    backgroundColor: '#EDEDEE',
+    backgroundColor: '#BDBDBE',
     justifyContent: 'center',
     alignItems: 'center',
     width: 100,
