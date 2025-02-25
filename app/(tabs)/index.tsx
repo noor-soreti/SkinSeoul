@@ -98,14 +98,15 @@ const HomeScreen = () => {
     const handleStepPress = async (stepId: number) => {
         try {
             const step = routineSteps.find(s => s.id === stepId);
-            // Simple toggle between null and completed
+            // toggle between null and completed
             const newStatus = step?.status === 'completed' ? null : 'completed';
             
-            // Update database if status changed
+            // update database if status changed
             if (step?.status !== newStatus) {
-                if (newStatus) {
-                    await updateStepStatus(stepId, selectedDate.toISOString().split('T')[0], newStatus);
-                }
+                console.log('Updating status from:', step?.status, 'to:', newStatus);
+                
+                await updateStepStatus(stepId, selectedDate.toISOString().split('T')[0], newStatus as CompletionStatus);
+                
                 // Update local state immediately
                 setRoutineSteps(currentSteps => 
                     currentSteps.map(step => 
@@ -129,9 +130,7 @@ const HomeScreen = () => {
             const newStatus = step?.status === 'skipped' ? null : 'skipped';
             
             if (step?.status !== newStatus) {
-                if (newStatus) {
-                    await updateStepStatus(stepId, selectedDate.toISOString().split('T')[0], newStatus);
-                }
+                await updateStepStatus(stepId, selectedDate.toISOString().split('T')[0], newStatus as CompletionStatus);
                 // Update local state immediately
                 setRoutineSteps(currentSteps => 
                     currentSteps.map(step => 

@@ -12,8 +12,12 @@ let db: SQLite.SQLiteDatabase;
 
 export async function initDatabase() {
   try {
-    db = await SQLite.openDatabaseAsync('skincare.db');
-    await createTables();
+    if (!db) {  // Only initialize if not already initialized
+      db = await SQLite.openDatabaseAsync('skincare.db');
+      await createTables();
+      console.log('Database initialized successfully');
+    }
+    return db;
   } catch (e) {
     const error: DatabaseErrorType = {
       message: 'Failed to initialize database',
@@ -23,6 +27,14 @@ export async function initDatabase() {
     console.error(error);
     throw error;
   }
+}
+
+// Add a helper function to ensure db is initialized
+async function ensureDatabase() {
+  if (!db) {
+    await initDatabase();
+  }
+  return db;
 }
 
 async function createTables() {
@@ -114,19 +126,38 @@ export async function updateStepStatus(
   note?: string
 ): Promise<void> {
   try {
-    await db.runAsync(
-      `INSERT OR REPLACE INTO step_completions (step_id, date, status, note)
-       VALUES (?, ?, ?, ?)`,
-      [stepId, date, status, note || null]
+    console.log('Updating step status:', { stepId, date, status, note });
+    // If status is null, delete the completion record
+    if (status === null) {
+      console.log('Deleting completion record');
+      await db.runAsync(
+        'DELETE FROM step_completions WHERE step_id = ? AND date = ?',
+        [stepId, date]
+      );
+    } else {
+      console.log('Inserting/updating completion record');
+      await db.runAsync(
+        `INSERT OR REPLACE INTO step_completions (step_id, date, status, note)
+         VALUES (?, ?, ?, ?)`,
+        [stepId, date, status, note || null]
+      );
+    }
+    
+    // Verify the update
+    const verification = await db.getAllAsync(
+      'SELECT * FROM step_completions WHERE step_id = ? AND date = ?',
+      [stepId, date]
     );
+    console.log('Verification after update:', verification);
+    
   } catch (e) {
+    console.error('Database error in updateStepStatus:', e);
     const error: DatabaseErrorType = {
       message: `Failed to update step status for step ${stepId}`,
       originalError: e instanceof Error ? e.message : String(e),
       operation: 'update',
       table: 'step_completions'
     };
-    console.error(error);
     throw error;
   }
 }
@@ -154,7 +185,9 @@ export async function getStepsWithCompletions(
   routineType: 'morning' | 'evening'
 ): Promise<(RoutineStep & { status: CompletionStatus | null })[]> {
   try {
-    return await db.getAllAsync(`
+    const database = await ensureDatabase();  // Ensure db is initialized
+    console.log('Getting steps with completions for:', { date, routineType });
+    return await database.getAllAsync(`
       SELECT 
         rs.*,
         sc.status
